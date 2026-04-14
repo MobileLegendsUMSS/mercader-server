@@ -1,0 +1,5 @@
+src/services:
+En esta carpeta iran todos los servicios para cada modulo y endpoint presente en la app,
+los servicios pueden contienen validaciones o no, principalmente tienen llamadas y consultas
+directas a la base de datos, llamadas a los utils para calculos, etc principalmente ademas de procesar
+parametros ya desestructurados por el controlador y devolver respuestas sin usar responses.

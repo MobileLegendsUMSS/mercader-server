@@ -1,0 +1,3 @@
+src/config:
+En esta carpeta iran todas las configuraciones de las dependencias instaladas,
+ademas de la configuracion de rutas, .env y del servidor perse.

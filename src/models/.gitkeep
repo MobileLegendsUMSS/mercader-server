@@ -1,0 +1,3 @@
+src/models:
+En esta carpeta iran todos los esquemas y modelos referidos a la base de datos por medio de el
+ORM manejado (mongoose), donde se detalla las colecciones, datos, tipos de datos, etc.

@@ -1,0 +1,20 @@
+{
+  "name": "mercader-server",
+  "version": "1.0.0",
+  "description": "Hola buenas tardes npm init -y npm install express mongoose dotenv cors npm install -D typescript @types/express @types/node @types/mongoose @types/cors nodemon ts-node",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MobileLegendsUMSS/mercader-server.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/MobileLegendsUMSS/mercader-server/issues"
+  },
+  "homepage": "https://github.com/MobileLegendsUMSS/mercader-server#readme"
+}
