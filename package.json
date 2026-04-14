@@ -1,0 +1,33 @@
+{
+  "name": "mercader-server",
+  "version": "1.0.0",
+  "description": "Hola buenas tardes npm init -y npm install express mongoose dotenv cors npm install -D typescript @types/express @types/node @types/mongoose @types/cors nodemon ts-node",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "tsx watch src/app.ts",
+    "build": "tsc",
+    "start": "node dist/app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MobileLegendsUMSS/mercader-server.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/MobileLegendsUMSS/mercader-server/issues"
+  },
+  "homepage": "https://github.com/MobileLegendsUMSS/mercader-server#readme",
+  "dependencies": {
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.19",
+    "@types/dotenv": "^6.1.1",
+    "@types/express": "^5.0.6"
+  }
+}

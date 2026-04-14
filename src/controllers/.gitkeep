@@ -1,0 +1,4 @@
+src/controllers:
+En esta carpeta iran todos los controladores para cada modulo presente en la app,
+los modulos contienen validaciones y llamadas a los servicios principalmente ademas de la
+desestructuracion en parametros, body, etc de las requests. 

@@ -1,0 +1,3 @@
+src/utils:
+En esta carpeta iran todas las funciones externas que no tienen que ver con la logica del negocio,
+modulos, ni ningun endpoint, son funciones genericas como generadores de numeros, generadores de htmls, etc.
