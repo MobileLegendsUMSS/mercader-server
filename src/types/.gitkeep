@@ -1,0 +1,3 @@
+src/types:
+En esta carpeta iran todos los tipos de datos (interfaces y enums), ya que se esta usando
+typescript se necesita un tipado estricto para tokens, datos de entrada, salida, etc.

@@ -1,0 +1,4 @@
+src/middlewares:
+En esta carpeta iran todas las funciones necesarias para hacer la evaluacion de rutas,
+controles de autenticacion, validaciones genericas (como ser de formato de imagen, etc) con
+el fin de condicionar el flujo de uso de endpoints.
