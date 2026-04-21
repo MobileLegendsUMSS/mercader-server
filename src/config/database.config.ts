@@ -1,7 +1,11 @@
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
+import * as path from "path";
 
-dotenv.config();
+//dotenv.config();
+
+dotenv.config({ path: path.join(process.cwd(), ".env") });
+
 
 export async function connectDB() {
   try {
