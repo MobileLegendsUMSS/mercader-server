@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { CategoriaService } from '../services/categoria.service';
 import { getValidObjectId } from '../utils/objectId.helper';
+import * as CategoryService from "../services/categoria.service";
 
 const categoriaService = new CategoriaService();
 
@@ -27,10 +28,29 @@ export const categoriaController = {
 
   async getAllCategories(req: Request, res: Response) {
     try {
-      const categorias = await categoriaService.getAllCategories();
-      res.json({ success: true, data: categorias });
-    } catch (error: any) {
-      res.status(500).json({ success: false, error: error.message });
+      const { result, statusCode, messageState, foundedCategories } = await CategoryService.getAllCategories();
+      if (!result) {
+        return res.status(statusCode).json({
+          success: false,
+          message: messageState
+        });
+      }
+      if (!foundedCategories) {
+        return res.status(200).json({
+          success: true,
+          message: "No existen categorias registradas."
+        });
+      }
+      res.status(200).json({
+        success: true,
+        message: "Se encontraron todas las categorias registradas exitosamente.",
+        data: foundedCategories
+      });
+    } catch (err) {
+      res.status(500).json({ 
+        success: false, 
+        message: `Error interno del servidor: ${(err as Error).message}` 
+      });
     }
   },
 
