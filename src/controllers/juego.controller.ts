@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { JuegoService } from '../services/juego.service';
+import * as GameService from "../services/juego.service";
 
 const juegoService = new JuegoService();
 
@@ -38,3 +39,37 @@ export const juegoController = {
     }
   }
 };
+
+export async function deleteGameById(req: Request, res: Response) {
+  try {
+    const { id } = req.query;
+    const { justificacionRetiro } = req.body;
+
+    if (!id || typeof id !== "string" ||
+      !justificacionRetiro || typeof justificacionRetiro !== "string") {
+      return res.status(400).json({
+        success: false,
+        message: "Parametros invalidos o vacios."
+      });
+    }
+    
+    const { result, statusCode, messageState, deletedGame } = await GameService.deleteGameById(id, justificacionRetiro);
+    if (!result) {
+      return res.status(statusCode).json({
+        success: false,
+        message: messageState
+      });
+    }
+    return res.status(200).json({
+      success: true,
+      message: "El juego solicitado ha sido eliminado.",
+      data: deletedGame
+    });
+  } catch (err) {
+    return {
+      result: false,
+      statusCode: 500,
+      messageState: `Error interno del servidor: ${(err as Error).message}`   
+    }
+  }
+}
