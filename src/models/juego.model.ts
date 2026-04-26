@@ -11,6 +11,8 @@ export interface IJuego extends Document {
   precio: number;
   imagen: string;
   disponible: boolean;
+  activo: boolean;
+  justificacionRetiro?: string 
   cantidad: number;
   id_dificultad: Types.ObjectId;
   id_editorial: Types.ObjectId;
@@ -80,6 +82,14 @@ const JuegoSchema = new Schema<IJuego>(
     disponible: {
       type: Boolean,
       default: true
+    },
+    activo: {
+      type: Boolean,
+      default: true
+    },
+    justificacionRetiro: {
+      type: String,
+      required: false
     },
     cantidad: {
       type: Number,
