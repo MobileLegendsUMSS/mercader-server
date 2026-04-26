@@ -9,14 +9,14 @@ interface ParamsDictionary {
 }
 
 export const juegoController = {
-  async create(req: Request, res: Response) {
-    try {
-      const juego = await juegoService.createGame(req.body);
-      res.status(201).json({ success: true, data: juego });
-    } catch (error: any) {
-      res.status(400).json({ success: false, error: error.message });
-    }
-  },
+  //async create(req: Request, res: Response) {
+  //  try {
+  //    const juego = await juegoService.createGame(req.body);
+  //    res.status(201).json({ success: true, data: juego });
+  //  } catch (error: any) {
+  //    res.status(400).json({ success: false, error: error.message });
+  //  }
+  //},
 
   async getAllGames(req: Request, res: Response) {
     try {
@@ -66,10 +66,47 @@ export async function deleteGameById(req: Request, res: Response) {
       data: deletedGame
     });
   } catch (err) {
-    return {
+    return res.status(500).json({
       result: false,
-      statusCode: 500,
-      messageState: `Error interno del servidor: ${(err as Error).message}`   
+      message: `Error interno del servidor: ${(err as Error).message}`   
+    });
+  }
+}
+
+export async function createGame(req: Request, res: Response) {
+  try {
+    const { idCategory } = req.query;
+    const gameInfo = req.body;
+
+    if (!idCategory || typeof idCategory !== "string") {
+      return res.status(400).json({
+        success: false,
+        message: "Categoria Invalida."
+      });
     }
+    if (!gameInfo || Object.keys(gameInfo).length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: "Informacion del juego invalida o incompleta."
+      });
+    }
+
+    const { result, statusCode, messageState, data} = await GameService.createGame(idCategory, gameInfo);
+    if (!result) {
+      return res.status(statusCode).json({
+        success: false,
+        message: messageState
+      });
+    }
+    return res.status(200).json({
+      success: true,
+      message: "El juego se ha creado exitosamente",
+      data: data
+    });
+  } catch (err) {
+    return res.status(500).json({
+      result: false,
+      message: `Error interno del servidor: ${(err as Error).message}`
+    });
   }
 }
