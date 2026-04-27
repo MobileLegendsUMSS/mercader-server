@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { JuegoService } from '../services/juego.service';
+import * as ServiceTypes from "../types/servicio.types"
 import * as GameService from "../services/juego.service";
 
 const juegoService = new JuegoService();
@@ -9,14 +10,6 @@ interface ParamsDictionary {
 }
 
 export const juegoController = {
-  //async create(req: Request, res: Response) {
-  //  try {
-  //    const juego = await juegoService.createGame(req.body);
-  //    res.status(201).json({ success: true, data: juego });
-  //  } catch (error: any) {
-  //    res.status(400).json({ success: false, error: error.message });
-  //  }
-  //},
 
   async getAllGames(req: Request, res: Response) {
     try {
@@ -75,13 +68,21 @@ export async function deleteGameById(req: Request, res: Response) {
 
 export async function createGame(req: Request, res: Response) {
   try {
-    const { idCategory } = req.query;
+    const { idCategory, services } = req.query;
     const gameInfo = req.body;
 
     if (!idCategory || typeof idCategory !== "string") {
       return res.status(400).json({
         success: false,
         message: "Categoria Invalida."
+      });
+    }
+    if (!Array.isArray(services) || services.length === 0 ||
+      !services.every(s => typeof s === "string" && 
+      Object.values(ServiceTypes.TipoServicio).includes(s as ServiceTypes.TipoServicio))) {
+      return res.status(400).json({
+        success: false,
+        message: "Falta catalogar el juego con algun servicio"
       });
     }
     if (!gameInfo || Object.keys(gameInfo).length === 0) {
@@ -91,7 +92,8 @@ export async function createGame(req: Request, res: Response) {
       });
     }
 
-    const { result, statusCode, messageState, data} = await GameService.createGame(idCategory, gameInfo);
+    const formatedServices = services as string[]
+    const { result, statusCode, messageState, data} = await GameService.createGame(idCategory, gameInfo, formatedServices);
     if (!result) {
       return res.status(statusCode).json({
         success: false,

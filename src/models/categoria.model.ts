@@ -1,14 +1,14 @@
 import mongoose, { Schema, Document } from 'mongoose';
 
 export interface ICategoria extends Document {
-  descripcion: string;
+  nombre: string;
   createdAt?: Date;
   updatedAt?: Date;
 }
 
 const CategoriaSchema = new Schema<ICategoria>(
   {
-    descripcion: {
+    nombre: {
       type: String,
       required: [true, 'La descripcion es obligatoria'],
       unique: true,
