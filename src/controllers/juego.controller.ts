@@ -1,11 +1,26 @@
 import { Request, Response } from 'express';
 import { JuegoService } from '../services/juego.service';
 import * as GameService from "../services/juego.service";
+import { Types } from 'mongoose'
+import { IJuego } from '../models/juego.model';
 
 const juegoService = new JuegoService();
 
 interface ParamsDictionary {
   id: string;
+}
+
+interface UpdateGameBody {
+    titulo?: string;
+    descripcion?: string;
+    tutorial?: string;
+    cant_min_pers?: number;
+    cant_max_pers?: number;
+    duracion_min?: number;
+    duracion_max?: number;
+    precio?: number;
+    imagen?: string;
+    categorias?: string[]; // Array de IDs de categorías
 }
 
 export const juegoController = {
@@ -37,7 +52,92 @@ export const juegoController = {
     } catch (error: any) {
       res.status(500).json({ success: false, error: error.message });
     }
-  }
+  },
+
+  async updateGame(req: Request<ParamsDictionary, {}, UpdateGameBody>, res: Response) {
+        try {
+            const { id } = req.params;
+            const {
+                titulo,
+                descripcion,
+                tutorial,
+                cant_min_pers,
+                cant_max_pers,
+                duracion_min,
+                duracion_max,
+                precio,
+                imagen,
+                categorias
+            } = req.body;
+
+            // Validar que al menos un campo viene para actualizar
+            if (!titulo && !descripcion && !tutorial && !cant_min_pers && 
+                !cant_max_pers && !duracion_min && !duracion_max && 
+                !precio && !imagen && !categorias) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Debe proporcionar al menos un campo para actualizar"
+                });
+            }
+
+            // Construir objeto con solo los campos que vienen en la petición
+            const updateData: Partial<IJuego> = {};
+            if (titulo !== undefined) updateData.titulo = titulo;
+            if (descripcion !== undefined) updateData.descripcion = descripcion;
+            if (tutorial !== undefined) updateData.tutorial = tutorial;
+            if (cant_min_pers !== undefined) updateData.cant_min_pers = cant_min_pers;
+            if (cant_max_pers !== undefined) updateData.cant_max_pers = cant_max_pers;
+            if (duracion_min !== undefined) updateData.duracion_min = duracion_min;
+            if (duracion_max !== undefined) updateData.duracion_max = duracion_max;
+            if (precio !== undefined) updateData.precio = precio;
+            if (imagen !== undefined) updateData.imagen = imagen;
+
+            // Validar categorías si se envían
+            if (categorias && (!Array.isArray(categorias) || categorias.length === 0)) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Las categorías deben ser un array no vacío"
+                });
+            }
+
+            // Validar IDs de categorías si se envían
+            if (categorias) {
+                for (const catId of categorias) {
+                    if (!Types.ObjectId.isValid(catId)) {
+                        return res.status(400).json({
+                            success: false,
+                            message: `ID de categoría inválido: ${catId}`
+                        });
+                    }
+                }
+            }
+
+            const { result, statusCode, messageState, data } = await juegoService.updateGame(
+                id, 
+                updateData, 
+                categorias
+            );
+
+            if (!result) {
+                return res.status(statusCode).json({
+                    success: false,
+                    message: messageState
+                });
+            }
+
+            return res.status(statusCode).json({
+                success: true,
+                message: messageState,
+                data: data
+            });
+
+        } catch (error: any) {
+            return res.status(500).json({
+                success: false,
+                message: `Error interno del servidor: ${error.message}`
+            });
+        }
+    }
 };
 
 export async function deleteGameById(req: Request, res: Response) {

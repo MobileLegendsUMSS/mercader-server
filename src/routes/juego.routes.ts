@@ -11,4 +11,6 @@ router.post('/', GameController.createGame);
 
 router.delete("/", GameController.deleteGameById);
 
+router.put('/:id', juegoController.updateGame);
+
 export default router

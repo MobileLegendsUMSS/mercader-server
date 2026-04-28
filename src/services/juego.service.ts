@@ -1,14 +1,129 @@
-import { ObjectId } from 'mongoose';
+import mongoose, { ObjectId, Types } from 'mongoose';
 import { Juego, IJuego } from '../models/juego.model';
 import { JuegoCategoria, IJuegoCategoria } from '../models/juegoCategoria.model';
-import { Types } from 'mongoose';
 
 export class JuegoService {
     //async createGame(data: Partial<IJuego>): Promise<IJuego> {
     //  const juego = new Juego(data);
     //  return await juego.save();
   //}
+  async updateGame(
+    id: string, 
+    updateData: Partial<IJuego>, 
+    categoriasIds?: string[]
+  ): Promise<any> {
+  const session = await mongoose.startSession();
+  session.startTransaction();
 
+  try {
+      // Validar que el juego existe
+      if (!Types.ObjectId.isValid(id)) {
+          return {
+              result: false,
+              statusCode: 400,
+              messageState: "ID de juego inválido"
+          };
+      }
+
+      // Validar que al menos se envía un campo para actualizar
+      if (!updateData || Object.keys(updateData).length === 0) {
+          return {
+              result: false,
+              statusCode: 400,
+              messageState: "No se enviaron datos para actualizar"
+          };
+      }
+
+      // Validar rangos si se actualizan
+      if (updateData.cant_min_pers && updateData.cant_max_pers) {
+          if (updateData.cant_max_pers < updateData.cant_min_pers) {
+              return {
+                  result: false,
+                  statusCode: 400,
+                  messageState: "La cantidad máxima debe ser mayor o igual a la mínima"
+              };
+          }
+      }
+
+      if (updateData.duracion_min && updateData.duracion_max) {
+          if (updateData.duracion_max < updateData.duracion_min) {
+              return {
+                  result: false,
+                  statusCode: 400,
+                  messageState: "La duración máxima debe ser mayor o igual a la mínima"
+              };
+          }
+      }
+
+      // Actualizar el juego
+      const updatedGame = await Juego.findByIdAndUpdate(
+          id,
+          { $set: updateData },
+          { new: true, runValidators: true, session }
+      );
+
+      if (!updatedGame) {
+          await session.abortTransaction();
+          session.endSession();
+          return {
+              result: false,
+              statusCode: 404,
+              messageState: "El juego no existe"
+          };
+      }
+
+      // Si se enviaron categorías, actualizar las relaciones
+      if (categoriasIds && categoriasIds.length > 0) {
+          // Eliminar todas las relaciones existentes
+          await JuegoCategoria.deleteMany(
+              { id_juego: new Types.ObjectId(id) },
+              { session }
+          );
+
+          // Crear nuevas relaciones
+          const nuevasRelaciones = categoriasIds.map(catId => ({
+              id_juego: new Types.ObjectId(id),
+              id_categoria: new Types.ObjectId(catId)
+          }));
+
+          await JuegoCategoria.insertMany(nuevasRelaciones, { session });
+      }
+
+      await session.commitTransaction();
+      session.endSession();
+
+      // Obtener el juego actualizado con sus categorías
+      const juegoConCategorias = await Juego.findById(id)
+          .populate('id_dificultad')
+          .populate('id_editorial')
+          .exec();
+
+      const categorias = await JuegoCategoria.find({ id_juego: new Types.ObjectId(id) })
+          .populate('id_categoria')
+          .exec();
+
+      return {
+          result: true,
+          statusCode: 200,
+          messageState: "Juego actualizado correctamente",
+          data: {
+              juego: juegoConCategorias,
+              categorias: categorias.map(c => c.id_categoria)
+          }
+      };
+
+  } catch (err) {
+      await session.abortTransaction();
+      session.endSession();
+      return {
+          result: false,
+          statusCode: 500,
+          messageState: `Error interno del servidor: ${(err as Error).message}`
+      };
+  }
+}
+
+  
   async getAllGames(): Promise<IJuego[]> {
     return await Juego.find()
       .populate('id_dificultad')
