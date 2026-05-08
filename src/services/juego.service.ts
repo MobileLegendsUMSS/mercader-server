@@ -24,17 +24,17 @@ export class JuegoService {
 
 export async function deleteGameById(id: string, justificacionRetiro: string) {
   try {
-    const deletedGame = await Juego.findByIdAndUpdate(
-      id,
+    const deletedGame = await Juego.findOneAndUpdate(
+      { _id: id, activo: {$ne: false}, justificacionRetiro: null },
       { $set: { activo: false, justificacionRetiro: justificacionRetiro } },
-      { new: true, runValidators: true }
+      { new: true }
     );
 
     if (!deletedGame) {
       return {
         result: false,
         statusCode: 404,
-        messageState: "El juego de mesa solicitado no existe."
+        messageState: "El juego de mesa solicitado no existe o ya fue dado de baja."
       };
     }
     return {
