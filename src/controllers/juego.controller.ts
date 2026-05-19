@@ -1,7 +1,8 @@
 import { Request, Response } from 'express';
 import { JuegoService } from '../services/juego.service';
-import { IJuego } from '../models/juego.model';
-import * as ServiceTypes from "../types/servicio.types"
+import { IJuego, Juego } from '../models/juego.model';
+import * as ServiceTypes from "../types/servicio.types";
+import * as GameTypes from "../types/juego.types";
 import * as GameService from "../services/juego.service";
 
 const juegoService = new JuegoService();
@@ -108,7 +109,51 @@ export async function createGame(req: Request, res: Response) {
     });
   } catch (err) {
     return res.status(500).json({
-      result: false,
+      success: false,
+      message: `Error interno del servidor: ${(err as Error).message}`
+    });
+  }
+}
+
+export async function updateGameById(req: Request, res: Response) {
+  try {
+    const { id_juego } = req.query;
+    const { fieldName, fieldValue } = req.body;
+
+    if ((!id_juego || typeof id_juego !== "string") ||
+      (!fieldName || typeof fieldName !== "string")) {
+      return res.status(400).json({
+        success: false,
+        message: "Id de juego o nombre de campo invalido."
+      });
+    }
+    if (!Object.keys(Juego.schema.paths).includes(fieldName)) {
+      return res.status(400).json({
+        success: false,
+        message: "Nombre del campo invalido."
+      });
+    }
+    if (!(Object.keys(Juego.schema.paths) as (keyof GameTypes.GameNumerItems)[]).includes(fieldName as keyof GameTypes.GameNumerItems)) {
+      return res.status(400).json({
+        success: false,
+        message: "Valor de campo invalido."
+      });
+    }
+
+    const { result, statusCode, messageState } = await GameService.updateGameById(id_juego, fieldName, fieldValue);
+    if (!result) {
+      return res.status(statusCode).json({
+        success: false,
+        message: messageState
+      });
+    }
+    return res.status(200).json({
+      success: true,
+      message: "El juego se ha actualizado correctamente."
+    });
+  } catch (err) {
+    return res.status(500).json({
+      success: false,
       message: `Error interno del servidor: ${(err as Error).message}`
     });
   }

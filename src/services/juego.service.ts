@@ -1,4 +1,3 @@
-import { ObjectId } from 'mongoose';
 import { Juego, IJuego } from '../models/juego.model';
 import { JuegoCategoria, IJuegoCategoria } from '../models/juegoCategoria.model';
 import { Types } from 'mongoose';
@@ -97,6 +96,44 @@ export async function createGame(idCategory: string, gameInfo: Partial<IJuego>, 
       statusCode: 200,
       messageState: "El juego se ha creado correctamente.",
       data: createdGame
+    };
+  } catch (err) {
+    return {
+      result: false,
+      statusCode: 500,
+      messageState: `Error interno del servidor: ${(err as Error).message}`
+    };
+  }
+}
+
+export async function updateGameById(idGame: string, fieldName: string, fieldValue: string | number) {
+  try {
+    const formatedIdGame = new Types.ObjectId(idGame);
+    const foundGame = await Juego.findOne({ _id: formatedIdGame });
+    if (!foundGame) {
+      return {
+        result: false,
+        statusCode: 400,
+        messageState: "Juego no encontrado"
+      };
+    }
+
+    const updatedGame = await Juego.findOneAndUpdate(
+      { _id: idGame },
+      { $set: { [fieldName]: fieldValue } },
+      { new: true }
+    );
+    if (!updatedGame) {
+      return {
+        result: false,
+        statusCode: 404,
+        messageState: "El juego no se pudo actualizar correctamente."
+      };
+    }
+    return {
+      result: true,
+      statusCode: 200,
+      messageState: "El juego se ha actualizado correctamente."
     };
   } catch (err) {
     return {
