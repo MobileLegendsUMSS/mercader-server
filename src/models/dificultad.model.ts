@@ -1,14 +1,15 @@
-import mongoose, { Schema, Document, Types } from 'mongoose';
+import mongoose, { Schema, Document } from 'mongoose';
 
 export interface IDificultad extends Document {
-  descripcion: string;
+  nombre: string;
 }
 
 const DificultadSchema = new Schema<IDificultad>(
   {
-    descripcion: {
+    nombre: {
       type: String,
       required: [true, 'La descripción es obligatoria'],
+      unique: true,
       trim: true,
       maxlength: [50, 'La descripción no puede exceder 50 caracteres']
     }
