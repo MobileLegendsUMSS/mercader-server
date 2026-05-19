@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { JuegoService } from '../services/juego.service';
+import { IJuego } from '../models/juego.model';
 import * as ServiceTypes from "../types/servicio.types"
 import * as GameService from "../services/juego.service";
 
@@ -68,8 +69,8 @@ export async function deleteGameById(req: Request, res: Response) {
 
 export async function createGame(req: Request, res: Response) {
   try {
-    const { idCategory, services } = req.query;
-    const gameInfo = req.body;
+    const { idCategory } = req.query;
+    const { services, ...gameInfo } = req.body;
 
     if (!idCategory || typeof idCategory !== "string") {
       return res.status(400).json({
@@ -93,7 +94,7 @@ export async function createGame(req: Request, res: Response) {
     }
 
     const formatedServices = services as string[]
-    const { result, statusCode, messageState, data} = await GameService.createGame(idCategory, gameInfo, formatedServices);
+    const { result, statusCode, messageState, data } = await GameService.createGame(idCategory, gameInfo, formatedServices);
     if (!result) {
       return res.status(statusCode).json({
         success: false,

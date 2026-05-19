@@ -54,6 +54,15 @@ export async function deleteGameById(id: string, justificacionRetiro: string) {
 
 export async function createGame(idCategory: string, gameInfo: Partial<IJuego>, services: string[]) {
   try{
+    const foundGame = await Juego.findOne({ titulo: gameInfo.titulo });
+    if (foundGame) {
+      return {
+        result: false,
+        statusCode: 400,
+        messageState: "El juego de mesa ya se encuentra registrado en el sistema."
+      };
+    }
+
     const createdGame = await Juego.create(gameInfo);
     if (!createdGame) {
       return {
@@ -77,7 +86,11 @@ export async function createGame(idCategory: string, gameInfo: Partial<IJuego>, 
     const formatedServices = services as ServiceTypes.TipoServicio[];
     const serviceResponse = await ServiceService.registerService(idGame, formatedServices);
     if (!serviceResponse.result) {
-      return serviceResponse;
+      return {
+        result: false,
+        statusCode: serviceResponse.statusCode,
+        messageState: serviceResponse.messageState
+      };
     }
     return {
       result: true,

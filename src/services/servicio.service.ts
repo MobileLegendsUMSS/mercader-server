@@ -11,12 +11,13 @@ export async function registerService(idGame: Types.ObjectId, services: ServiceT
       return {
         result: false,
         statusCode: 404,
-        messageState: "El juego no se ha registrado correctamente"
+        messageState: "El juego no se ha registrado correctamente."
       };
     }
 
-    const registeredServices: ServiceTypes.IServicioJuego[] | unknown[]  = []
-    for (const service of services) {
+    const uniqueServices = [...new Set(services)];
+    const registeredServices: ServiceTypes.IServicioJuego[] = []
+    for (const service of uniqueServices) {
       const foundService = await Servicio.findOne({
         nombre: service
       }, "_id");
@@ -24,7 +25,7 @@ export async function registerService(idGame: Types.ObjectId, services: ServiceT
         return {
           result: false,
           statusCode: 404,
-          messageState: "El servicio relacionado no existe."
+          messageState: "El o los servicio relacionados no existe."
         };
       }
       const idService = foundService._id;
