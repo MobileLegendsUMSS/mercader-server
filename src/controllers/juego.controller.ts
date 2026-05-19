@@ -47,7 +47,7 @@ export async function deleteGameById(req: Request, res: Response) {
         message: "Parametros invalidos o vacios."
       });
     }
-    
+
     const { result, statusCode, messageState, deletedGame } = await GameService.deleteGameById(id, justificacionRetiro);
     if (!result) {
       return res.status(statusCode).json({
@@ -63,7 +63,7 @@ export async function deleteGameById(req: Request, res: Response) {
   } catch (err) {
     return res.status(500).json({
       result: false,
-      message: `Error interno del servidor: ${(err as Error).message}`   
+      message: `Error interno del servidor: ${(err as Error).message}`
     });
   }
 }
@@ -80,8 +80,8 @@ export async function createGame(req: Request, res: Response) {
       });
     }
     if (!Array.isArray(services) || services.length === 0 ||
-      !services.every(s => typeof s === "string" && 
-      Object.values(ServiceTypes.TipoServicio).includes(s as ServiceTypes.TipoServicio))) {
+      !services.every(s => typeof s === "string" &&
+        Object.values(ServiceTypes.TipoServicio).includes(s as ServiceTypes.TipoServicio))) {
       return res.status(400).json({
         success: false,
         message: "Falta catalogar el juego con algun servicio"
@@ -127,16 +127,23 @@ export async function updateGameById(req: Request, res: Response) {
         message: "Id de juego o nombre de campo invalido."
       });
     }
-    if (!Object.keys(Juego.schema.paths).includes(fieldName)) {
+    if (!GameTypes.stringFields.includes(fieldName as keyof GameTypes.GameStringItems) &&
+      !GameTypes.numericFields.includes(fieldName as keyof GameTypes.GameNumericItems)) {
       return res.status(400).json({
         success: false,
         message: "Nombre del campo invalido."
       });
     }
-    if (!(Object.keys(Juego.schema.paths) as (keyof GameTypes.GameNumerItems)[]).includes(fieldName as keyof GameTypes.GameNumerItems)) {
+    if (GameTypes.stringFields.includes(fieldName as keyof GameTypes.GameStringItems) && typeof fieldValue !== 'string') {
       return res.status(400).json({
         success: false,
-        message: "Valor de campo invalido."
+        message: "El campo requiere un valor de texto."
+      });
+    }
+    if (GameTypes.numericFields.includes(fieldName as keyof GameTypes.GameNumericItems) && typeof fieldValue !== 'number') {
+      return res.status(400).json({
+        success: false,
+        message: "El campo requiere un valor numerico."
       });
     }
 

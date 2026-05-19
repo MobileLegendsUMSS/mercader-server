@@ -3,6 +3,9 @@ import { JuegoCategoria, IJuegoCategoria } from '../models/juegoCategoria.model'
 import { Types } from 'mongoose';
 import * as ServiceTypes from "../types/servicio.types";
 import * as ServiceService from "../services/servicio.service";
+import { Categoria } from '../models/categoria.model';
+import { Dificultad } from '../models/dificultad.model';
+import { Editorial } from '../models/editorial.model';
 
 export class JuegoService {
   async getAllGames(): Promise<IJuego[]> {
@@ -118,17 +121,82 @@ export async function updateGameById(idGame: string, fieldName: string, fieldVal
       };
     }
 
-    const updatedGame = await Juego.findOneAndUpdate(
-      { _id: idGame },
-      { $set: { [fieldName]: fieldValue } },
-      { new: true }
-    );
-    if (!updatedGame) {
-      return {
-        result: false,
-        statusCode: 404,
-        messageState: "El juego no se pudo actualizar correctamente."
-      };
+    if (fieldName === "categoria") {
+      const foundCategory = await Categoria.findOne({ descripcion: fieldValue });
+      if (!foundCategory) {
+        return {
+          result: false,
+          statusCode: 400,
+          messageState: "Categoria de juego no encontrada."
+        };
+      }
+      const updatedGame = await JuegoCategoria.findOneAndUpdate(
+        { _id: formatedIdGame },
+        { $set: { id_categoria: foundCategory._id } },
+        { new: true }
+      );
+      if (!updatedGame) {
+        return {
+          result: false,
+          statusCode: 404,
+          messageState: "El juego no se pudo actualizar correctamente."
+        };
+      }
+    } else if (fieldName === "dificultad") {
+      const foundDifficulty = await Dificultad.findOne({ descripcion: fieldValue });
+      if (!foundDifficulty) {
+        return {
+          result: false,
+          statusCode: 400,
+          messageState: "Dificultad del juego no encontrada."
+        };
+      }
+      const updatedGame = await Juego.findOneAndUpdate(
+        { _id: formatedIdGame },
+        { $set: { id_dificultad: foundDifficulty._id } },
+        { new: true }
+      );
+      if (!updatedGame) {
+        return {
+          result: false,
+          statusCode: 404,
+          messageState: "El juego no se pudo actualizar correctamente."
+        };
+      }
+    } else if (fieldName === "editorial") {
+      const foundEditorial = await Dificultad.findOne({ descripcion: fieldValue });
+      if (!foundEditorial) {
+        return {
+          result: false,
+          statusCode: 400,
+          messageState: "Editorial del juego no encontrada."
+        };
+      }
+      const updatedGame = await Juego.findOneAndUpdate(
+        { _id: formatedIdGame },
+        { $set: { id_editorial: foundEditorial._id } },
+        { new: true }
+      );
+      if (!updatedGame) {
+        return {
+          result: false,
+          statusCode: 404,
+          messageState: "El juego no se pudo actualizar correctamente."
+        };
+      }
+    } else {
+      const updatedGame = await Juego.findOneAndUpdate(
+        { _id: idGame },
+        { $set: { [fieldName]: fieldValue } },
+        { new: true }
+      );
+      if (!updatedGame) {
+        return {
+          result: false,
+          statusCode: 404,
+          messageState: "El juego no se pudo actualizar correctamente."
+        };
+      }
     }
     return {
       result: true,
