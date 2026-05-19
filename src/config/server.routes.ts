@@ -6,9 +6,14 @@ import editorialRoutes from '../routes/editorial.routes';
 import CarritoRoutes from '../routes/carrito.routes';
 import CompraRoutes from "../routes/compra.routes";
 import PrestamoRoutes from "../routes/prestamo.routes";
+import AuthRoutes from "../routes/auth.routes";
 
 const router = Router();
 
+// Rutas de autenticación
+router.use('/api/auth', AuthRoutes);
+
+// Rutas de juegos y categorías
 router.use('/api/juegos', juegoRoutes);
 router.use('/api/categorias', categoriaRoutes);
 router.use('/api/dificultades', dificultadRoutes);
