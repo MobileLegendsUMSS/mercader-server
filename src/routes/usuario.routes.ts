@@ -5,4 +5,6 @@ const router = Router();
 
 router.get("/usuarios/info-personal", UsuarioController.getPersonalInfo);
 
+router.post("/usuarios/favoritos", UsuarioController.registerFavoriteGame);
+
 export default router;
