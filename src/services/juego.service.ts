@@ -164,7 +164,7 @@ export async function updateGameById(idGame: string, fieldName: string, fieldVal
         };
       }
     } else if (fieldName === "editorial") {
-      const foundEditorial = await Dificultad.findOne({ descripcion: fieldValue });
+      const foundEditorial = await Editorial.findOne({ descripcion: fieldValue });
       if (!foundEditorial) {
         return {
           result: false,
