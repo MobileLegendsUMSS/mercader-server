@@ -53,6 +53,16 @@ export async function registerFavoriteGame(req: Request, res: Response) {
     }
 
     const { result, statusCode, messageState } = await UsuarioService.registerFavoriteGame(id_usuario, id_juego);
+    if (!result) {
+      return res.status(statusCode).json({
+        success: false,
+        message: messageState
+      });
+    }
+    return res.status(201).json({
+      success: true,
+      message: "El juego se ha agregado a favoritos correctamente."
+    });
   } catch (err) {
     return res.status(500).json({
       success: false,

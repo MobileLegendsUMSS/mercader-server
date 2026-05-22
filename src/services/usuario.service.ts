@@ -1,5 +1,7 @@
 import { Types } from "mongoose";
 import { Usuario } from "../models/usuario.model";
+import { Juego } from "../models/juego.model";
+import { UsuarioJuego } from "../models/usuariojuego.model";
 import * as UsuarioTypes from "../types/usuario.types";
 
 export async function getPersonalInfo(idUser: string) {
@@ -41,3 +43,47 @@ export async function getPersonalInfo(idUser: string) {
   }
 }
 
+export async function registerFavoriteGame(idUser: string, idGame: string) {
+  try {
+    const formatedIdUser = new Types.ObjectId(idUser);
+    const foundUser = await Usuario.findById(formatedIdUser);
+    if (!foundUser) {
+      return {
+        result: false,
+        statusCode: 404,
+        messageState: "Usuario no encontrado."
+      };
+    }
+    
+    const formatedIdGame = new Types.ObjectId(idGame);
+    const foundGame = await Juego.findById(formatedIdGame);
+    if (!foundGame) {
+      return {
+        result: false,
+        statusCode: 404,
+        messageState: "Juego no encontrado."
+      };
+    }
+
+    const newUserGame = { id_usuario: formatedIdUser, id_juego: formatedIdGame };
+    const createdUserGame = await UsuarioJuego.create(newUserGame);
+    if (!createdUserGame) {
+      return {
+        result: false,
+        statusCode: 400,
+        messageState: "El juego no se pudo registrar como favorito."
+      };
+    }
+    return {
+      result: true,
+      statusCode: 201,
+      messageState: "El juego se ha agregado a favoritos correctamente."
+    };
+  } catch (err) {
+    return {
+      result: false,
+      statusCode: 500,
+      messageState: `Error interno en el servidor: ${(err as Error).message}`
+    };
+  }
+}
