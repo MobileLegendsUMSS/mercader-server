@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
+import * as TokenTypes from "../types/token.types";
 
 const JWT_SECRET = process.env.JWT_SECRET;
 if (!JWT_SECRET) {
@@ -7,10 +8,7 @@ if (!JWT_SECRET) {
 }
 
 export interface AuthRequest extends Request {
-  usuario?: {
-    id: string;
-    nombre: string;
-  };
+  user?: TokenTypes.TokenPayload;
 }
 
 export const autenticarToken = (
@@ -34,10 +32,10 @@ export const autenticarToken = (
     const decodificado = jwt.verify(token, JWT_SECRET) as any;
     
     // Guardar los datos del usuario en la request
-    req.usuario = {
-      id: decodificado.id,
+    req.user = {
+      id_usuario: decodificado.id,
       nombre: decodificado.nombre
-    };
+    } as TokenTypes.TokenPayload;
 
     next();
   } catch (error: any) {

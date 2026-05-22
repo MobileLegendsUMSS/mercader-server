@@ -14,20 +14,20 @@ export class JuegoService {
       .populate('id_editorial')
       .exec();
   }
+}
 
-  async getGameById(id: string): Promise<IJuego | null> {
-    if (!Types.ObjectId.isValid(id)) return null;
-    return await Juego.findById(id)
-      .populate('id_dificultad')
-      .populate('id_editorial')
-      .exec();
-  }
+export async function getGameById(id: string): Promise<IJuego | null> {
+  if (!Types.ObjectId.isValid(id)) return null;
+  return await Juego.findById(id)
+    .populate('id_dificultad')
+    .populate('id_editorial')
+    .exec();
 }
 
 export async function deleteGameById(id: string, justificacionRetiro: string) {
   try {
     const deletedGame = await Juego.findOneAndUpdate(
-      { _id: id, activo: {$ne: false}, justificacionRetiro: null },
+      { _id: id, activo: { $ne: false }, justificacionRetiro: null },
       { $set: { activo: false, justificacionRetiro: justificacionRetiro } },
       { new: true }
     );
@@ -55,7 +55,7 @@ export async function deleteGameById(id: string, justificacionRetiro: string) {
 }
 
 export async function createGame(idCategory: string, gameInfo: Partial<IJuego>, services: string[]) {
-  try{
+  try {
     const foundGame = await Juego.findOne({ titulo: gameInfo.titulo });
     if (foundGame) {
       return {
@@ -73,7 +73,7 @@ export async function createGame(idCategory: string, gameInfo: Partial<IJuego>, 
         messageState: "El juego no se pudo crear correctamente"
       };
     }
-    
+
     const idGame = new Types.ObjectId(createdGame._id);
     const newGameCategory = { id_juego: idGame, id_categoria: idCategory };
     const createdGameCategory = await JuegoCategoria.create(newGameCategory);

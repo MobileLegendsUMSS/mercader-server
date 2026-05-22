@@ -1,10 +1,12 @@
 import { Request, Response } from "express";
 import { Juego } from "../models/juego.model";
 import * as CarritoService from "../services/carrito.service";
+import * as TokenTypes from "../types/token.types";
 
 export async function registerGameCart(req: Request, res: Response) {
   try {
-    const { id_usuario, id_juego, cantidad } = req.body;
+    const { id_usuario } = req.user as TokenTypes.TokenPayload;
+    const { id_juego, cantidad } = req.body;
 
     if ((!id_usuario || typeof id_usuario !== "string") ||
       (!id_juego || typeof id_juego !== "string")) {
@@ -41,7 +43,7 @@ export async function registerGameCart(req: Request, res: Response) {
 
 export async function viewGamesCart(req: Request, res: Response) {
   try {
-    const { id_usuario } = req.query;
+    const { id_usuario } = req.user as TokenTypes.TokenPayload;
 
     if (!id_usuario || typeof id_usuario !== "string") {
       return res.status(400).json({
@@ -72,7 +74,8 @@ export async function viewGamesCart(req: Request, res: Response) {
 
 export async function updateGameCart(req: Request, res: Response) {
   try {
-    const { id_usuario, id_juego, cantidad } = req.body;
+    const { id_usuario } = req.user as TokenTypes.TokenPayload;
+    const { id_juego, cantidad } = req.body;
 
     if ((!id_usuario || typeof id_usuario !== "string") ||
       (!id_juego || typeof id_juego !== "string")) {
@@ -109,7 +112,8 @@ export async function updateGameCart(req: Request, res: Response) {
 
 export async function deleteGameCart(req: Request, res: Response) {
   try {
-    const { id_usuario, id_juego } = req.body;
+    const { id_usuario } = req.user as TokenTypes.TokenPayload;
+    const { id_juego } = req.body;
 
     if ((!id_usuario || typeof id_usuario !== "string") ||
       (!id_juego || typeof id_juego !== "string")) {

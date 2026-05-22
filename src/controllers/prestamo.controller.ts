@@ -2,10 +2,13 @@ import { Request, Response } from "express";
 import { toBoliviaTime } from "../utils/date.helper";
 import * as ServicioTypes from "../types/servicio.types";
 import * as PrestamoService from "../services/prestamo.service";
+import * as TokenTypes from "../types/token.types";
 
 export async function registerUserLoan(req: Request, res: Response) {
   try {
-    const { id_usuario, id_juego } = req.query;
+
+    const { id_usuario } = req.user as TokenTypes.TokenPayload;
+    const { id_juego } = req.query;
     const { servicio, fecha_prestamo } = req.body;
 
     if ((!id_usuario || typeof id_usuario !== "string") ||
@@ -79,7 +82,7 @@ export async function registerUserLoan(req: Request, res: Response) {
 
 export async function getUserLoans(req: Request, res: Response) {
   try {
-    const { id_usuario } = req.query;
+    const { id_usuario } = req.user as TokenTypes.TokenPayload;
     const { vigent, collected, returned } = req.body;
     
     if (!id_usuario || typeof id_usuario !== "string") {
