@@ -87,3 +87,25 @@ export async function registerFavoriteGame(idUser: string, idGame: string) {
     };
   }
 }
+
+export async function getFavoriteGames(idUser: string) {
+  try {
+    const formatedIdUser = new Types.ObjectId(idUser);
+    const foundUser = await Usuario.findById(formatedIdUser);
+    if (!foundUser) {
+      return {
+        result: false,
+        statusCode: 404,
+        messageState: "Usuario no encontrado."
+      };
+    }
+
+    //const foundGame = await
+  } catch (err) {
+    return {
+      result: false,
+      statusCode: 500,
+      messageState: `Error interno en el servidor: ${(err as Error).message}`
+    };
+  }
+}

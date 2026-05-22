@@ -1,10 +1,25 @@
 import { Router } from "express";
+import * as Autorizacion from "../middlewares/autenticacion.middleware";
 import * as UsuarioController from "../controllers/usuario.controller";
 
 const router = Router();
 
-router.get("/usuarios/info-personal", UsuarioController.getPersonalInfo);
+router.get(
+  "/usuarios/info-personal",
+  Autorizacion.autenticarToken,
+  UsuarioController.getPersonalInfo
+);
 
-router.post("/usuarios/favoritos", UsuarioController.registerFavoriteGame);
+router.post(
+  "/usuarios/favoritos",
+  Autorizacion.autenticarToken,
+  UsuarioController.registerFavoriteGame
+);
+
+router.get(
+  "/usuarios/favoritos",
+  Autorizacion.autenticarToken,
+  UsuarioController.getFavoriteGames
+);
 
 export default router;

@@ -5,7 +5,7 @@ import * as UsuarioService from "../services/usuario.service";
 export async function getPersonalInfo(req: Request, res: Response) {
   try {
     const { id_usuario } = req.user as TokenTypes.TokenPayload;
-    
+
     if (!id_usuario || typeof id_usuario !== "string") {
       return res.status(400).json({
         success: false,
@@ -63,6 +63,26 @@ export async function registerFavoriteGame(req: Request, res: Response) {
       success: true,
       message: "El juego se ha agregado a favoritos correctamente."
     });
+  } catch (err) {
+    return res.status(500).json({
+      success: false,
+      message: `Error interno en el servidor: ${(err as Error).message}`
+    });
+  }
+}
+
+export async function getFavoriteGames(req: Request, res: Response) {
+  try {
+    const { id_usuario } = req.user as TokenTypes.TokenPayload;
+
+    if (!id_usuario || typeof id_usuario !== "string") {
+      return res.status(400).json({
+        success: false,
+        message: "Id de usuario o juego invalido."
+      });
+    }
+
+    //const { result, statusCode, messageState, data } = await UsuarioService.getFavoriteGames(id_usuario);
   } catch (err) {
     return res.status(500).json({
       success: false,
