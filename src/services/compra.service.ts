@@ -80,15 +80,29 @@ export async function registerUserPurchase(idUser: string, idPayMethod: string) 
           messageState: "Hay juegos retirados o sin stock en el carrito, por favor, actualice el carrito."
         };
       }
-      await Juego.findOneAndUpdate(
+      const updatedGame = await Juego.findOneAndUpdate(
         { _id: foundGame._id },
-        { $set: { cantidad: foundGame.cantidad - cartGame.cantidad_solicitada } }
+        { $set: { cantidad: foundGame.cantidad - cartGame.cantidad_solicitada } },
+        { new: true }
       );
+      if (!updatedGame) {
+        return {
+          result: false,
+          statusCode: 400,
+          messageState: "No se pudo actualizar el stock del juego asociado al prestamo correctamente."
+        };
+      }
+      if (updatedGame.cantidad === 0) {
+        await Juego.findOneAndUpdate(
+          { _id: foundGame._id },
+          { $set: { disponible: false } }
+        );
+      }
     }
 
     //await CarritoJuego.deleteMany({ id_carrito: cartId });
     const updatedCart = await Carrito.findOneAndUpdate(
-      { _id: cartId }, 
+      { _id: cartId },
       { $set: { activo: false } },
       { new: true, runValidators: true }
     );
@@ -150,7 +164,6 @@ export async function getUserPurchases(idUser: string) {
         messageState: "El usuario no tiene compras registradas."
       };
     }
-    //console.log(foundPurchases);
 
     const data = [];
     for (const purchase of foundPurchases) {

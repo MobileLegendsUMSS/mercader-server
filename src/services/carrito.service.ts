@@ -19,7 +19,12 @@ export async function registerGameCart(idUser: string, idGame: string, amount: n
     }
 
     const formatedIdGame = new Types.ObjectId(idGame);
-    const foundGame = await Juego.findById(formatedIdGame);
+    const foundGame = await Juego.findOne({
+      _id: formatedIdGame,
+      activo: true,
+      cantidad: { $gt: 0 },
+      disponible: true
+    });
     if (!foundGame) {
       return {
         result: false,
@@ -186,7 +191,12 @@ export async function updateGameCart(idUser: string, idGame: string, amount: num
     }
 
     const formatedIdGame = new Types.ObjectId(idGame);
-    const foundGame = await Juego.findById(formatedIdGame);
+    const foundGame = await Juego.findOne({
+      _id: formatedIdGame,
+      activo: true,
+      cantidad: { $gt: 0 },
+      disponible: true 
+    });
     if (!foundGame) {
       return {
         result: false,
@@ -252,7 +262,12 @@ export async function deleteGameCart(idUser: string, idGame: string) {
     }
 
     const formatedIdGame = new Types.ObjectId(idGame);
-    const foundGame = await Juego.findById(formatedIdGame);
+    const foundGame = await Juego.findOne({
+      _id: formatedIdGame,
+      activo: true,
+      cantidad: { $gt: 0 },
+      disponible: true
+    });
     if (!foundGame) {
       return {
         result: false,
