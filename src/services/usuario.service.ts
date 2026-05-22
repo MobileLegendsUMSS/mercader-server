@@ -172,3 +172,64 @@ export async function getFavoriteGames(idUser: string) {
     };
   }
 }
+
+export async function deleteFavoriteGame(idUser: string, idGame: string) {
+  try {
+    const formatedIdUser = new Types.ObjectId(idUser);
+    const foundUser = await Usuario.findById(formatedIdUser);
+    if (!foundUser) {
+      return {
+        result: false,
+        statusCode: 404,
+        messageState: "Usuario no encontrado."
+      };
+    }
+
+    const formatedIdGame = new Types.ObjectId(idGame);
+    const foundGame = await Juego.findOne({
+      _id: formatedIdGame,
+      activo: true,
+    });
+    if (!foundGame) {
+      return {
+        result: false,
+        statusCode: 404,
+        messageState: "Juego no encontrado."
+      };
+    }
+
+    const foundUserGame = await UsuarioJuego.findOne({
+      id_usuario: formatedIdUser,
+      id_juego: formatedIdGame
+    });
+    if (!foundUserGame) {
+      return {
+        result: false,
+        statusCode: 404,
+        messageState: "El usuario no tiene el juego consultado como favorito."
+      };
+    }
+    const deletedUserGame = await UsuarioJuego.findOneAndDelete({
+      id_usuario: formatedIdUser,
+      id_juego: formatedIdGame
+    });
+    if (!deletedUserGame) {
+      return {
+        result: false,
+        statusCode: 400,
+        messageState: "El juego no se pudo desmarcar como favorito."
+      };
+    }
+    return {
+      result: true,
+      statusCode: 200,
+      messageState: "El juego se ha quitado de favoritos correctamente."
+    }
+  } catch (err) {
+    return {
+      result: false,
+      statusCode: 500,
+      messageState: `Error interno en el servidor: ${(err as Error).message}`
+    };
+  }
+}

@@ -22,4 +22,10 @@ router.get(
   UsuarioController.getFavoriteGames
 );
 
+router.delete(
+  "/usuarios/favoritos",
+  Autorizacion.autenticarToken,
+  UsuarioController.deleteFavoriteGame
+);
+
 export default router;
