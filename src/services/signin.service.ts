@@ -2,37 +2,54 @@ import { Usuario } from '../models/usuario.model';
 import * as UserTypes from '../types/usuario.types';
 import bcrypt from 'bcryptjs';
 
-export const registrarUsuario = async (
-  datos: UserTypes.SigninPayload
-): Promise<UserTypes.SigninResponse> => {
-  // Validar que los datos no estén vacíos
-  if (!datos.nombre || !datos.contrasenna) {
-    throw new Error('El nombre y la contraseña son requeridos');
-  }
+export async function registrarUsuario(personalInfo: UserTypes.SigninPayload) {
+
+  const {
+    nombre,
+    contrasenna,
+    nombres = null,
+    apellidos = null,
+    telefono,
+    correo_contacto,
+  } = personalInfo
 
   // Verificar si el usuario ya existe
-  const usuarioExistente = await Usuario.findOne({ nombre: datos.nombre });
+  const usuarioExistente = await Usuario.findOne({ nombre: nombre });
   if (usuarioExistente) {
-    throw new Error('El usuario ya existe');
+    return {
+      result: false,
+      statusCode: 400,
+      messageState: "El usuario ya existe."
+    };
   }
 
   // Encriptar la contraseña con bcryptjs (10 rondas de salt)
-  const contrasennaEncriptada = await bcrypt.hash(datos.contrasenna, 10);
+  const contrasennaEncriptada = await bcrypt.hash(contrasenna, 10);
 
   // Crear el nuevo usuario
-  const nuevoUsuario = new Usuario({
-    nombre: datos.nombre,
-    contrasenna: contrasennaEncriptada
-  });
-
-  // Guardar en la base de datos
-  const usuarioGuardado = await nuevoUsuario.save();
-
+  let registerCondition = {
+    nombre: nombre,
+    constrasenna: contrasennaEncriptada,
+    telefono: telefono,
+    correo_contacto: correo_contacto
+  };
+  if (nombres) {
+    Object.assign(registerCondition, { nombres: nombres });
+  }
+  if (apellidos) {
+    Object.assign(registerCondition, { apellidos: apellidos });
+  }
+  const nuevoUsuario = await Usuario.create(registerCondition);
+  if (!nuevoUsuario) {
+    return {
+      result: false,
+      statusCode: 400,
+      messageState: "No se pudo crear el usuario correctamente."
+    };
+  }
   return {
-    mensaje: 'Usuario registrado exitosamente',
-    usuario: {
-      id: usuarioGuardado._id.toString(),
-      nombre: usuarioGuardado.nombre
-    }
+    result: true,
+    statusCode: 201,
+    mensajeState: "Usuario registrado exitosamente"
   };
 };
