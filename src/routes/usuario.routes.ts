@@ -3,6 +3,6 @@ import * as UsuarioController from "../controllers/usuario.controller";
 
 const router = Router();
 
-router.get("/usuarios/perfil", UsuarioController.getPersonalInfo);
+router.get("/usuarios/info-personal", UsuarioController.getPersonalInfo);
 
 export default router;
