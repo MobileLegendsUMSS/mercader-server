@@ -82,7 +82,23 @@ export async function getFavoriteGames(req: Request, res: Response) {
       });
     }
 
-    //const { result, statusCode, messageState, data } = await UsuarioService.getFavoriteGames(id_usuario);
+    const { result, statusCode, messageState, data } = await UsuarioService.getFavoriteGames(id_usuario);
+    if (!result) {
+      return res.status(statusCode).json({
+        success: false,
+        message: messageState
+      });
+    }
+    if (!data || data.length === 0) {
+      return res.status(200).json({
+        success: true,
+        message: "El usuario no tiene juegos favoritos registrados."
+      });
+    }
+    return res.status(200).json({
+      success: true,
+      message: "Los juegos favoritos del usuario se han obtenido correctamente."
+    });
   } catch (err) {
     return res.status(500).json({
       success: false,

@@ -54,14 +54,29 @@ export async function registerFavoriteGame(idUser: string, idGame: string) {
         messageState: "Usuario no encontrado."
       };
     }
-    
+
     const formatedIdGame = new Types.ObjectId(idGame);
-    const foundGame = await Juego.findById(formatedIdGame);
+    const foundGame = await Juego.findOne({
+      _id: formatedIdGame,
+      activo: true,
+    });
     if (!foundGame) {
       return {
         result: false,
         statusCode: 404,
         messageState: "Juego no encontrado."
+      };
+    }
+
+    const foundUserGame = await UsuarioJuego.findOne({
+      id_usuario: formatedIdUser,
+      id_juego: formatedIdGame
+    });
+    if (foundUserGame) {
+      return {
+        result: false,
+        statusCode: 400,
+        messageState: "El juego ya esta marcado como favorito."
       };
     }
 
@@ -100,7 +115,55 @@ export async function getFavoriteGames(idUser: string) {
       };
     }
 
-    //const foundGame = await
+    const foundUserGame = await UsuarioJuego.find({
+      id_usuario: formatedIdUser
+    }, "id_juego");
+    if (!foundUserGame || foundUserGame.length === 0) {
+      return {
+        result: true,
+        statusCode: 200,
+        messageState: "El usuario no tiene juegos favoritos."
+      };
+    }
+
+    const data = [];
+    for (const userGame of foundUserGame) {
+      const foundGame = await Juego.findOne({
+        _id: userGame.id_juego,
+        activo: true
+      });
+      if (!foundGame) {
+        return {
+          result: false,
+          statusCode: 404,
+          messageState: "Un juego que se marcado como favorito no exite."
+        };
+      }
+      const gameInfo = {
+        titlo: foundGame.titulo,
+        descripcion: foundGame.descripcion,
+        cant_min_pers: foundGame.cant_min_pers,
+        cant_max_pers: foundGame.cant_max_pers,
+        duracion_min: foundGame.duracion_min,
+        duracion_max: foundGame.duracion_max,
+        precio: foundGame.precio,
+        disponible: foundGame.disponible
+      };
+      data.push(gameInfo);
+    }
+    if (!data || data.length === 0) {
+      return {
+        result: false,
+        statusCode: 400,
+        messageState: "Error al recopilar informacion de juegos favoritos."
+      };
+    }
+    return {
+      result: true,
+      statusCode: 200,
+      messageState: "Los juegos favoritos del usuario se han obtenido correctamente.",
+      data: data
+    }
   } catch (err) {
     return {
       result: false,
