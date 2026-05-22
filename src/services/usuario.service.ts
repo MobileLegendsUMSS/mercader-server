@@ -43,6 +43,64 @@ export async function getPersonalInfo(idUser: string) {
   }
 }
 
+export async function updatePersonalInfo(idUser: string, personalInfo: UsuarioTypes.SigninPayload) {
+  try {
+    const {
+      nombres = null,
+      apellidos = null,
+      telefono = null,
+      correo_contacto = null
+    } = personalInfo;
+
+    const formatedIdUser = new Types.ObjectId(idUser);
+    const foundUser = await Usuario.findById(formatedIdUser);
+    if (!foundUser) {
+      return {
+        result: false,
+        statusCode: 404,
+        messageState: "Usuario no encontrado."
+      };
+    }
+
+    let updateCondition = {};
+    if (nombres) {
+      Object.assign(updateCondition, { nombres: nombres });
+    }
+    if (apellidos) {
+      Object.assign(updateCondition, { apellidos: apellidos });
+    }
+    if (telefono) {
+      Object.assign(updateCondition, { telefono: telefono });
+    }
+    if (correo_contacto) {
+      Object.assign(updateCondition, { correo_contacto: correo_contacto });
+    }
+    const updatedPersonalInfo = await Usuario.findOneAndUpdate(
+      { _id: formatedIdUser },
+      { $set: updateCondition },
+      { new: true }
+    );
+    if (!updatedPersonalInfo) {
+      return {
+        result: false,
+        statusCode: 400,
+        messageState: "La informacion del usuario no se pudo actualizar correctamente."
+      };
+    }
+    return {
+      result: true,
+      statusCode: 200,
+      messageState: "La informacion del usuario se ha actualizado correctamente."
+    };
+  } catch (err) {
+    return {
+      result: false,
+      statusCode: 500,
+      messageState: `Error interno en el servidor: ${(err as Error).message}`
+    };
+  }
+}
+
 export async function registerFavoriteGame(idUser: string, idGame: string) {
   try {
     const formatedIdUser = new Types.ObjectId(idUser);

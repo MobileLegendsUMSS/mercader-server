@@ -10,6 +10,12 @@ router.get(
   UsuarioController.getPersonalInfo
 );
 
+router.patch(
+  "/usuarios/info-personal",
+  Autorizacion.autenticarToken,
+  UsuarioController.updatePersonalInfo
+)
+
 router.post(
   "/usuarios/favoritos",
   Autorizacion.autenticarToken,

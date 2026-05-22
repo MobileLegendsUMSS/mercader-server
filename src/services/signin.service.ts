@@ -3,7 +3,6 @@ import * as UserTypes from '../types/usuario.types';
 import bcrypt from 'bcryptjs';
 
 export async function registrarUsuario(personalInfo: UserTypes.SigninPayload) {
-
   const {
     nombre,
     contrasenna,
