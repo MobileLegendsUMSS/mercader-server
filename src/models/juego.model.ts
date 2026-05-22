@@ -14,6 +14,7 @@ export interface IJuego extends Document {
   activo: boolean;
   justificacionRetiro?: string 
   cantidad: number;
+  cantidad_prestamo: number;
   id_dificultad: Types.ObjectId;
   id_editorial: Types.ObjectId;
   createdAt?: Date;
@@ -95,6 +96,12 @@ const JuegoSchema = new Schema<IJuego>(
       type: Number,
       required: true,
       min: [0, 'La cantidad no puede ser negativa'],
+      default: 0
+    },
+    cantidad_prestamo: {
+      type: Number,
+      required: true,
+      min: [0, "La cantidad de prestamos no puede ser negativa"],
       default: 0
     },
     id_dificultad: {
