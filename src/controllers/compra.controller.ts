@@ -22,7 +22,7 @@ export async function registerUserPurchase(req: Request, res: Response) {
     }
     return res.status(200).json({
       success: true,
-      message: "Compra registrada exitosamente."
+      message: "La compra se ha registrado exitosamente."
     }); 
   } catch (err) {
     return res.status(500).json({
