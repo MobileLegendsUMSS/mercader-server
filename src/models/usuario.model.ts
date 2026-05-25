@@ -1,12 +1,23 @@
-import mongoose from "mongoose";
+import mongoose, { Document } from "mongoose";
 import * as UserTypes from "../types/usuario.types";
 
-const userSchema = new mongoose.Schema<UserTypes.IUsuario>(
+export interface IUsuario extends Document {
+  nombre: string;
+  contrasenna: string;
+  createdAt?: Date;
+  updatedAt?: Date;
+}
+
+const userSchema = new mongoose.Schema<IUsuario>(
   {
     nombre: {
       type: String,
       unique: true,
       required: [true, "Nombre del usuario requerido."]
+    },
+    contrasenna: {
+      type: String,
+      required: [true, "Contraseña del usuario requerida."]
     }
   },
   {
@@ -16,4 +27,4 @@ const userSchema = new mongoose.Schema<UserTypes.IUsuario>(
   }
 );
 
-export const Usuario = mongoose.model<UserTypes.IUsuario>("Usuario", userSchema);
+export const Usuario = mongoose.model<IUsuario>("Usuario", userSchema);

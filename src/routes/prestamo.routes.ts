@@ -1,14 +1,15 @@
 import { Router } from "express";
 import * as PrestamoController from "../controllers/prestamo.controller";
+import * as Autorizacion from "../middlewares/autenticacion.middleware";
 
 const router = Router();
 
-router.post("/usuarios/prestamo", PrestamoController.registerUserLoan);
+router.post("/usuarios/prestamo", Autorizacion.autenticarToken, PrestamoController.registerUserLoan);
 
-router.get("/usuarios/prestamos", PrestamoController.getUserLoans);
+router.get("/usuarios/prestamos", Autorizacion.autenticarToken, PrestamoController.getUserLoans);
 
-router.patch("/admin/prestamo", PrestamoController.updateUserLoan);
+router.patch("/admin/prestamo", Autorizacion.autenticarToken, PrestamoController.updateUserLoan);
 
-router.delete("/usuarios/prestamo", PrestamoController.deleteUserLoan);
+router.delete("/usuarios/prestamo", Autorizacion.autenticarToken, PrestamoController.deleteUserLoan);
 
 export default router;

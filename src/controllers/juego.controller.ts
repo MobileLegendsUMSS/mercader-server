@@ -22,18 +22,23 @@ export const juegoController = {
     }
   },
 
-  async getGameById(req: Request<ParamsDictionary>, res: Response) {
-    try {
-      const juego = await juegoService.getGameById(req.params.id);
-      if (!juego) {
-        return res.status(404).json({ success: false, error: 'Juego no encontrado' });
-      }
-      res.json({ success: true, data: juego });
-    } catch (error: any) {
-      res.status(500).json({ success: false, error: error.message });
-    }
-  }
 };
+
+export async function getGameById(req: Request, res: Response) {
+  try {
+    const { id } = req.params;
+    if (!id || typeof id !== "string") {
+      return res.status(400).json({ success: false, error: 'Id de juego invalido' });
+    }
+    const juego = await GameService.getGameById(id);
+    if (!juego) {
+      return res.status(404).json({ success: false, error: 'Juego no encontrado' });
+    }
+    res.json({ success: true, data: juego });
+  } catch (error: any) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+}
 
 export async function deleteGameById(req: Request, res: Response) {
   try {

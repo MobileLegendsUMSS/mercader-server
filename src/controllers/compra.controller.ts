@@ -1,9 +1,11 @@
 import { Request, Response } from "express";
 import * as CompraService from "../services/compra.service";
+import * as TokenTypes from "../types/token.types";
 
 export async function registerUserPurchase(req: Request, res: Response) {
   try {
-    const { id_usuario, id_metodo_pago } = req.body;
+    const { id_usuario } = req.user as TokenTypes.TokenPayload;
+    const { id_metodo_pago } = req.body;
 
     if ((!id_usuario || typeof id_usuario !== "string") ||
       (!id_metodo_pago || typeof id_metodo_pago !== "string")) {
@@ -34,7 +36,7 @@ export async function registerUserPurchase(req: Request, res: Response) {
 
 export async function getUserPurchases(req: Request, res: Response) {
   try {
-    const { id_usuario } = req.query;
+    const { id_usuario } = req.user as TokenTypes.TokenPayload;
 
     if (!id_usuario || typeof id_usuario !== "string") {
       return res.status(400).json({
