@@ -1,3 +1,5 @@
+import { Types } from "mongoose";
+
 export interface IUsuario {
   _id?: string;
   nombre: string;
@@ -23,6 +25,10 @@ export interface LoginResponse {
 export interface SigninPayload {
   nombre: string;
   contrasenna: string;
+  nombres: string;
+  apellidos: string;
+  telefono: string;
+  correo_contacto: string;
 }
 
 export interface SigninResponse {
@@ -32,4 +38,9 @@ export interface SigninResponse {
     id: string;
     nombre: string;
   };
+}
+
+export interface IUsuarioJuego {
+  id_usuario: Types.ObjectId;
+  id_juego: Types.ObjectId;
 }
