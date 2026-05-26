@@ -50,7 +50,6 @@ const userSchema = new mongoose.Schema<IUsuario>(
       type: Number,
       unique: false,
       required: true,
-      min: [1, "El total no puede ser negativo ni igual a 0."],
       default: 0
     },
     foto_perfil: {

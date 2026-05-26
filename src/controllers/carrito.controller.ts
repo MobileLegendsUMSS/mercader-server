@@ -8,6 +8,8 @@ export async function registerGameCart(req: Request, res: Response) {
     const { id_usuario } = req.user as TokenTypes.TokenPayload;
     const { id_juego, cantidad } = req.body;
 
+    console.log(id_usuario, " ", id_juego);
+
     if ((!id_usuario || typeof id_usuario !== "string") ||
       (!id_juego || typeof id_juego !== "string")) {
       return res.status(400).json({
