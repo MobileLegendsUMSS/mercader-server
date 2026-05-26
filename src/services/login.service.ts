@@ -1,7 +1,7 @@
+import { Types } from 'mongoose';
+import { generateToken } from '../utils/jwt.helper';
 import { Usuario, IUsuario } from '../models/usuario.model';
 import * as UserTypes from '../types/usuario.types';
-import { Types } from 'mongoose';
-import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 
 const JWT_SECRET = process.env.JWT_SECRET;
@@ -28,12 +28,21 @@ export const autenticarUsuario = async (
     datos.contrasenna,
     usuario.contrasenna
   );
-  
+
   if (!contrasennaValida) {
     throw new Error('Usuario o contraseña incorrectos');
   }
 
+  const formatedUserId = usuario._id.toString();
+  console.log(formatedUserId);
+
+  const token = generateToken({
+    id_usuario: formatedUserId,
+    nombre: usuario.nombre
+  })
+
   // Generar token JWT con expiración de 24 horas
+  /*
   const token = jwt.sign(
     {
       id: usuario._id.toString(),
@@ -42,6 +51,7 @@ export const autenticarUsuario = async (
     JWT_SECRET,
     { expiresIn: '24h' }
   );
+  */
 
   return {
     mensaje: 'Autenticación exitosa',
@@ -56,8 +66,8 @@ export const autenticarUsuario = async (
 export class UsuarioService {
   async getUsuario(): Promise<IUsuario[]> {
     return await Usuario.find()
-    .populate('id_dificultad')
-    .populate('id_editorial')
+      .populate('id_dificultad')
+      .populate('id_editorial')
       .exec();
   }
 
