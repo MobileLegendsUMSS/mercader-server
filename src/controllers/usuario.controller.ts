@@ -186,6 +186,16 @@ export async function deleteFavoriteGame(req: Request, res: Response) {
     }
 
     const { result, statusCode, messageState } = await UsuarioService.deleteFavoriteGame(id_usuario, id_juego);
+    if (!result) {
+      return res.status(statusCode).json({
+        success: false,
+        message: messageState
+      });
+    }
+    return res.status(200).json({
+      success: true,
+      message: "El juego se ha quitado de favoritos correctamente."
+    });
   } catch (err) {
     return res.status(500).json({
       success: false,
