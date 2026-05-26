@@ -11,5 +11,5 @@ router.get("/usuarios/prestamos", Autorizacion.autenticarToken, PrestamoControll
 router.patch("/admin/prestamo", Autorizacion.autenticarToken, PrestamoController.updateUserLoan);
 
 router.delete("/usuarios/prestamo", Autorizacion.autenticarToken, PrestamoController.deleteUserLoan);
-
+  
 export default router;
