@@ -162,7 +162,8 @@ export async function getFavoriteGames(req: Request, res: Response) {
     }
     return res.status(200).json({
       success: true,
-      message: "Los juegos favoritos del usuario se han obtenido correctamente."
+      message: "Los juegos favoritos del usuario se han obtenido correctamente.",
+      data: data
     });
   } catch (err) {
     return res.status(500).json({

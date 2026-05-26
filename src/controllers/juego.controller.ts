@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { JuegoService } from '../services/juego.service';
-import { IJuego, Juego } from '../models/juego.model';
 import * as ServiceTypes from "../types/servicio.types";
+import * as TokenTypes from "../types/token.types";
 import * as GameTypes from "../types/juego.types";
 import * as GameService from "../services/juego.service";
 
@@ -26,15 +26,31 @@ export const juegoController = {
 
 export async function getGameById(req: Request, res: Response) {
   try {
+    const { id_usuario } = req.user as TokenTypes.TokenPayload;
     const { id } = req.params;
     if (!id || typeof id !== "string") {
-      return res.status(400).json({ success: false, error: 'Id de juego invalido' });
+      return res.status(400).json({
+        success: false,
+        message: 'Id de juego invalido' 
+      });
     }
-    const juego = await GameService.getGameById(id);
-    if (!juego) {
-      return res.status(404).json({ success: false, error: 'Juego no encontrado' });
+    const { result, statusCode, messageState, data } = await GameService.getGameById(id_usuario, id);
+    if (!result) {
+      return res.status(statusCode).json({
+        success: false,
+        message: messageState
+      });
     }
-    res.json({ success: true, data: juego });
+    if (!data) {
+      return res.status(404).json({
+        success: false,
+        message: "Juego no encontrado"
+      });
+    }
+    res.status(200).json({
+      success: true,
+      data: data 
+    });
   } catch (error: any) {
     res.status(500).json({ success: false, error: error.message });
   }

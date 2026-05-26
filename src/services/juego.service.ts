@@ -6,6 +6,8 @@ import * as ServiceService from "../services/servicio.service";
 import { Categoria } from '../models/categoria.model';
 import { Dificultad } from '../models/dificultad.model';
 import { Editorial } from '../models/editorial.model';
+import { UsuarioJuego } from "../models/usuariojuego.model"
+import { Usuario } from "../models/usuario.model";
 
 export class JuegoService {
   async getAllGames(): Promise<IJuego[]> {
@@ -16,12 +18,52 @@ export class JuegoService {
   }
 }
 
-export async function getGameById(id: string): Promise<IJuego | null> {
-  if (!Types.ObjectId.isValid(id)) return null;
-  return await Juego.findById(id)
+export async function getGameById(idUser: string, id: string) {
+  const formatedIdUser = new Types.ObjectId(idUser);
+  const foundUser = await Usuario.findById(formatedIdUser);
+  if (!foundUser) {
+    return {
+      result: false,
+      statusCode: 404,
+      messageState: "Usuario no encontrado."
+    };
+  }
+
+  if (!Types.ObjectId.isValid(id)) {
+    return {
+      result: false,
+      statusCode: 400,
+      messageState: "Id de juego inválido."
+    };
+  }
+  const foundGame = await Juego.findById(id)
     .populate('id_dificultad')
     .populate('id_editorial')
     .exec();
+  if (!foundGame) {
+    return {
+      result: false,
+      statusCode: 404,
+      messageState: "Juego no encontrado."
+    };
+  }
+
+  const formatedIdGame = new Types.ObjectId(id);
+  const foundUserGame = await UsuarioJuego.findOne({
+    id_usuario: formatedIdUser,
+    id_juego: formatedIdGame
+  });
+
+  const flag = (foundUserGame) ? true : false;
+  const gameData = foundGame.toObject() as typeof foundGame & { isFavorite: boolean };
+  gameData.isFavorite = flag;
+
+  return {
+    result: true,
+    statusCode: 200,
+    messageState: "Juego encontrado exitosamente.",
+    data: gameData
+  };
 }
 
 export async function deleteGameById(id: string, justificacionRetiro: string) {
