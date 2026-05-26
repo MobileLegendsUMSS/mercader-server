@@ -33,6 +33,7 @@ export interface SigninPayload {
 
 export interface SigninResponse {
   mensaje: string;
+  token: string;
   usuario: {
     id: string;
     nombre: string;

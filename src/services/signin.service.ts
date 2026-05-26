@@ -51,4 +51,4 @@ export async function registrarUsuario(personalInfo: UserTypes.SigninPayload) {
     statusCode: 201,
     mensajeState: "Usuario registrado exitosamente"
   };
-};
+}
