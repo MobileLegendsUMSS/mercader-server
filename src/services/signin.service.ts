@@ -1,4 +1,5 @@
 import { Usuario } from '../models/usuario.model';
+import { generateToken } from '../utils/jwt.helper';
 import * as UserTypes from '../types/usuario.types';
 import bcrypt from 'bcryptjs';
 
@@ -28,7 +29,7 @@ export async function registrarUsuario(personalInfo: UserTypes.SigninPayload) {
   // Crear el nuevo usuario
   let registerCondition = {
     nombre: nombre,
-    constrasenna: contrasennaEncriptada,
+    contrasenna: contrasennaEncriptada,
     telefono: telefono,
     correo_contacto: correo_contacto
   };
@@ -46,9 +47,20 @@ export async function registrarUsuario(personalInfo: UserTypes.SigninPayload) {
       messageState: "No se pudo crear el usuario correctamente."
     };
   }
+
+  const formatedUserId = nuevoUsuario._id.toString();
+  console.log(formatedUserId);
+
+  const token = generateToken({
+    id_usuario: formatedUserId,
+    nombre: nuevoUsuario.nombre
+  });
+
   return {
     result: true,
     statusCode: 201,
-    mensajeState: "Usuario registrado exitosamente"
+    mensajeState: "Usuario registrado exitosamente",
+    data: nuevoUsuario,
+    token: token
   };
 }

@@ -33,7 +33,7 @@ export const autenticarToken = (
     
     // Guardar los datos del usuario en la request
     req.user = {
-      id_usuario: decodificado.id,
+      id_usuario: decodificado.id_usuario,
       nombre: decodificado.nombre
     } as TokenTypes.TokenPayload;
 

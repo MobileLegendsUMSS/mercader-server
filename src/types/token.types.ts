@@ -1,7 +1,6 @@
-import { Types } from "mongoose";
-
 export interface TokenPayload {
-  id_usuario: Types.ObjectId;
+  id_usuario: string;
+  nombre: string;
 }
 
 declare module "express-serve-static-core" {
