@@ -198,6 +198,7 @@ export async function getFavoriteGames(idUser: string) {
         };
       }
       const gameInfo = {
+        id_juego: foundGame._id,
         titlo: foundGame.titulo,
         descripcion: foundGame.descripcion,
         cant_min_pers: foundGame.cant_min_pers,
