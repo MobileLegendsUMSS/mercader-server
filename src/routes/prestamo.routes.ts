@@ -7,6 +7,7 @@ const router = Router();
 router.post("/usuarios/prestamo", Autorizacion.autenticarToken, PrestamoController.registerUserLoan);
 
 router.get("/usuarios/prestamos", Autorizacion.autenticarToken, PrestamoController.getUserLoans);
+router.post("/usuarios/prestamos", Autorizacion.autenticarToken, PrestamoController.getUserLoans);
 
 router.patch("/admin/prestamo", Autorizacion.autenticarToken, PrestamoController.updateUserLoan);
 
