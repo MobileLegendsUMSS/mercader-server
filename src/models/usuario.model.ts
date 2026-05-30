@@ -2,6 +2,7 @@ import mongoose, { Document } from "mongoose";
 import * as UserTypes from "../types/usuario.types";
 import { truncateSync } from "node:fs";
 
+// si esta el interface creo que de nada serviria el usuario.types
 export interface IUsuario extends Document {
   nombre: string;
   contrasenna: string;
@@ -14,8 +15,8 @@ export interface IUsuario extends Document {
   createdAt?: Date;
   updatedAt?: Date;
 }
-
-const userSchema = new mongoose.Schema<IUsuario>(
+// ojo aqui
+const userSchema = new mongoose.Schema<UserTypes.IUsuario>(
   {
     nombre: {
       type: String,
@@ -64,4 +65,4 @@ const userSchema = new mongoose.Schema<IUsuario>(
   }
 );
 
-export const Usuario = mongoose.model<IUsuario>("Usuario", userSchema); 
+export const Usuario = mongoose.model<UserTypes.IUsuario>("Usuario", userSchema); 

@@ -1,6 +1,12 @@
+import { Types } from "mongoose";
 import { Usuario } from '../models/usuario.model';
-import { generateToken } from '../utils/jwt.helper';
+import { Rol } from '../models/rol.model';
+import { UsuarioRol } from '../models/usuarioRol.model';
 import * as UserTypes from '../types/usuario.types';
+import * as RolTypes from '../types/rol.types';
+
+import { generateToken } from '../utils/jwt.helper';
+
 import bcrypt from 'bcryptjs';
 
 export async function registrarUsuario(personalInfo: UserTypes.SigninPayload) {
@@ -22,6 +28,19 @@ export async function registrarUsuario(personalInfo: UserTypes.SigninPayload) {
       messageState: "El usuario ya existe."
     };
   }
+
+  const foundRol = await Rol.findOne({ nombre_rol: "usuario" });
+
+  if (!foundRol) {
+    return {
+      result: false,
+      statusCode: 404,
+      mensajeState: "El Rol no se encontrado o no existe.",
+      rol: "-1"
+    };
+  }
+  const idRol = foundRol._id;
+  const rol = foundRol.nombre_rol;
 
   // Encriptar la contraseña con bcryptjs (10 rondas de salt)
   const contrasennaEncriptada = await bcrypt.hash(contrasenna, 10);
@@ -47,20 +66,36 @@ export async function registrarUsuario(personalInfo: UserTypes.SigninPayload) {
       messageState: "No se pudo crear el usuario correctamente."
     };
   }
-
+  
   const formatedUserId = nuevoUsuario._id.toString();
   console.log(formatedUserId);
-
+  
   const token = generateToken({
     id_usuario: formatedUserId,
     nombre: nuevoUsuario.nombre
   });
 
+  let registeredUserRol = {
+    id_usuario: nuevoUsuario._id,
+    id_rol: idRol
+  } 
+
+  const rolUsuario = await UsuarioRol.create(registeredUserRol);
+
+  if (!rolUsuario) {
+    return {
+      result: false,
+      statusCode: 400,
+      messageState: "No se pudo asignar el rol al usuario correctamente."
+    };
+  }
+
   return {
     result: true,
     statusCode: 201,
-    mensajeState: "Usuario registrado exitosamente",
+    mensajeState: "Registrado exitoso, y asignado a rol Usuario",
     data: nuevoUsuario,
-    token: token
+    token: token,
+    rol: rol
   };
 }
