@@ -56,7 +56,7 @@ export async function signin(req: Request, res: Response) {
     }
 
     // Llamar al servicio de registro
-    const { result, statusCode, messageState, data, token } = await SigninService.registrarUsuario(personalInfo);
+    const { result, statusCode, messageState, data, token, rol } = await SigninService.registrarUsuario(personalInfo);
     if (!result) {
       return res.status(statusCode).json({
         success: false,
@@ -67,7 +67,8 @@ export async function signin(req: Request, res: Response) {
       success: true,
       message: "El usuario se ha creado correctamente.",
       data: data,
-      token: token
+      token: token,
+      rol: rol
     });
   } catch (err) {
     console.error('Error en signin:', (err as Error).message);
