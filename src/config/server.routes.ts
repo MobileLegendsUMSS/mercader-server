@@ -8,7 +8,8 @@ import CompraRoutes from "../routes/compra.routes";
 import PrestamoRoutes from "../routes/prestamo.routes";
 import AuthRoutes from "../routes/auth.routes";
 import UsuarioRoutes from "../routes/usuario.routes";
-import resenaRoutes from "../routes/resena.routes";
+import ResenaRoutes from "../routes/resena.routes";
+import ReporteRoutes from "../routes/reporte.routes";
 
 const router = Router();
 
@@ -24,7 +25,8 @@ router.use("/api/servicios", CarritoRoutes);
 router.use("/api/servicios", CompraRoutes);
 router.use("/api/servicios", PrestamoRoutes);
 router.use("/api/perfil", UsuarioRoutes);
-router.use("/api/resenas", resenaRoutes);
+router.use("/api/resenas", ResenaRoutes);
+router.use("/api/reportes", ReporteRoutes);
 
 router.get("/health", (req: Request, res: Response) => {
   res.status(200).json({

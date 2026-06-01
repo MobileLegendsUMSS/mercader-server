@@ -33,7 +33,7 @@ export async function registerUserLoan(idUser: string, idGame: string, service: 
         messageState: "El juego solicitado no tiene unidades disponibles."
       };
     }
-    
+
     const foundService = await Servicio.findOne({
       nombre: service
     });
@@ -84,9 +84,9 @@ export async function registerUserLoan(idUser: string, idGame: string, service: 
           messageState: "El juego no se ha podido registrar en el prestamo."
         };
       }
-      
+
       const updatedGame = await Juego.findOneAndUpdate(
-        { _id: formatedIdGame},
+        { _id: formatedIdGame },
         { $set: { cantidad: foundGame.cantidad - 1, cantidad_prestamo: foundGame.cantidad_prestamo + 1, prestamos: foundGame.prestamos + 1 } },
         { new: true }
       );
@@ -163,7 +163,7 @@ export async function getUserLoans(idUser: string, vigent: boolean, collected: b
     const data = [];
     for (const loan of foundUserLoans) {
       const foundLoanGame = await PrestamoJuego.findOne({
-        id_prestamo: loan._id 
+        id_prestamo: loan._id
       }, "id_juego servicio");
       if (!foundLoanGame) {
         return {
@@ -216,8 +216,8 @@ export async function getUserLoans(idUser: string, vigent: boolean, collected: b
 
 export async function updateUserLoan(
   idLoan: string,
-  idUser: string, 
-  startDate: Date | undefined, 
+  idUser: string,
+  startDate: Date | undefined,
   endDate?: Date) {
   try {
     const formatedIdUser = new Types.ObjectId(idUser);
@@ -356,7 +356,7 @@ export async function deleteUserLoan(idLoan: string, idUser: string) {
         messageState: "Prestamo consultado no encontrado."
       };
     }
-    
+
     const deletedUserLoan = await Prestamo.findOneAndDelete({
       _id: formatedIdLoan
     });
