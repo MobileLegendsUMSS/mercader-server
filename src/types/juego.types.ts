@@ -19,7 +19,9 @@ export interface IJuego extends Document {
   id_editorial: Types.ObjectId;
   createdAt?: Date;
   updatedAt?: Date;
-  visitas: number
+  visitas: number;
+  ventas: number;
+  prestamos: number;
 }
 
 export interface GameNumericItems {

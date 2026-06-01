@@ -7,6 +7,10 @@ const router = Router();
 
 router.get('/', Autorizacion.autenticarToken, juegoController.getAllGames);
 router.get('/:id', Autorizacion.autenticarToken, GameController.getGameById);
+router.get("/sistema/recientes", Autorizacion.autenticarToken, GameController.getMostRecentGames);
+router.get("/sistema/visitados", Autorizacion.autenticarToken, GameController.getMostVisitedGames);
+router.get("/sistema/comprados", Autorizacion.autenticarToken, GameController.getMostSelledGames);
+router.get("/sistema/prestados", Autorizacion.autenticarToken, GameController.getMostBorrowedGames);
 
 router.post('/', Autorizacion.autenticarToken, GameController.createGame);
 

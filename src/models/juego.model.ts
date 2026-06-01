@@ -98,6 +98,16 @@ const JuegoSchema = new Schema<JuegoTypes.IJuego>(
       type: Number,
       required: true,
       default: 0
+    },
+    ventas: {
+      type: Number,
+      required: true,
+      default: 0
+    },
+    prestamos: {
+      type: Number,
+      required: true,
+      default: 0
     }
   },
   {
