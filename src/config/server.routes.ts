@@ -8,6 +8,7 @@ import CompraRoutes from "../routes/compra.routes";
 import PrestamoRoutes from "../routes/prestamo.routes";
 import AuthRoutes from "../routes/auth.routes";
 import UsuarioRoutes from "../routes/usuario.routes";
+import resenaRoutes from "../routes/resena.routes";
 
 const router = Router();
 
@@ -23,6 +24,7 @@ router.use("/api/servicios", CarritoRoutes);
 router.use("/api/servicios", CompraRoutes);
 router.use("/api/servicios", PrestamoRoutes);
 router.use("/api/perfil", UsuarioRoutes);
+router.use("/api/resenas", resenaRoutes);
 
 router.get("/health", (req: Request, res: Response) => {
   res.status(200).json({

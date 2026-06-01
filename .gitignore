@@ -842,4 +842,9 @@ FodyWeavers.xsd
 ### VisualStudio Patch ###
 # Additional files built by Visual Studio
 
+fly.toml
+Dockerfile
+.github
+
+
 # End of https://www.toptal.com/developers/gitignore/api/intellij,jetbrains,visualstudiocode,visualstudio,node,windows,linux,macos,sublimetext
