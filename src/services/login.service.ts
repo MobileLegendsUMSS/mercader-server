@@ -1,6 +1,6 @@
 import { Types } from 'mongoose';
 import { generateToken } from '../utils/jwt.helper';
-import { Usuario, IUsuario } from '../models/usuario.model';
+import { Usuario } from '../models/usuario.model';
 import * as UserTypes from '../types/usuario.types';
 import bcrypt from 'bcryptjs';
 import { UsuarioRol } from '../models/usuarioRol.model';
@@ -12,7 +12,6 @@ if (!JWT_SECRET) {
 }
 
 export async function autenticarUsuario(datos: UserTypes.LoginPayload) {
-  // Validar que los datos no estén vacíos
   if (!datos.nombre || !datos.contrasenna) {
     throw new Error('El nombre y la contraseña son requeridos');
   }
@@ -33,25 +32,27 @@ export async function autenticarUsuario(datos: UserTypes.LoginPayload) {
     throw new Error('Usuario o contraseña incorrectos');
   }
 
-  const formatedUserId = usuario._id.toString();
-  console.log(formatedUserId);
+  const formattedUserId = usuario._id.toString();
+
+  // Obtener el rol del usuario
+  const usuarioRol = await UsuarioRol.findOne({ id_usuario: usuario._id });
+  if (!usuarioRol) {
+    throw new Error('No se encontró el rol del usuario');
+  }
+
+  const rolDoc = await Rol.findOne({ _id: usuarioRol.id_rol });
+  if (!rolDoc) {
+    throw new Error('No se encontró el rol del usuario');
+  }
+
+  const rolNombre = rolDoc.nombre_rol;
 
   const token = generateToken({
-    id_usuario: formatedUserId,
-    nombre: usuario.nombre
+    id_usuario: formattedUserId,
+    nombre: usuario.nombre,
+    rol: rolNombre
   });
 
-  const idRol = await UsuarioRol.findOne({ id_usuario: usuario._id });
-  if (!idRol) {
-    return {
-      result: false,
-      statusCode: 400,
-      messageState: "No se encontro el rol del Usuario."
-    };
-  }
-  const getRol = await Rol.findOne({ _id: idRol.id_rol });
-  // por alguna razon lo marca en rojo el getRol, pero esta bien es del ts el error, no es un error real
-  let rolName = getRol.nombre_rol;
   return {
     mensaje: 'Autenticación exitosa',
     token,
@@ -59,23 +60,6 @@ export async function autenticarUsuario(datos: UserTypes.LoginPayload) {
       id: usuario._id.toString(),
       nombre: usuario.nombre
     },
-    rol: rolName
+    rol: rolNombre
   };
-};
-
-export class UsuarioService {
-  async getUsuario(): Promise<IUsuario[]> {
-    return await Usuario.find()
-      .populate('id_dificultad')
-      .populate('id_editorial')
-      .exec();
-  }
-
-  async getUsuarioById(id: string): Promise<IUsuario | null> {
-    if (!Types.ObjectId.isValid(id)) return null;
-    return await Usuario.findById(id)
-      .populate('id_dificultad')
-      .populate('id_editorial')
-      .exec();
-  }
 }
