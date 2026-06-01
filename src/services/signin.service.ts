@@ -3,7 +3,6 @@ import { Usuario } from '../models/usuario.model';
 import { Rol } from '../models/rol.model';
 import { UsuarioRol } from '../models/usuarioRol.model';
 import * as UserTypes from '../types/usuario.types';
-import * as RolTypes from '../types/rol.types';
 
 import { generateToken } from '../utils/jwt.helper';
 

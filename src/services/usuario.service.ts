@@ -76,7 +76,7 @@ export async function updatePersonalInfo(idUser: string, personalInfo: UsuarioTy
       Object.assign(updateCondition, { correo_contacto: correo_contacto });
     }
     const updatedPersonalInfo = await Usuario.findOneAndUpdate(
-      { _id: formatedIdUser },
+      { _id: formatedIdUser } as any,
       { $set: updateCondition },
       { new: true }
     );
