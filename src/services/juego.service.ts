@@ -1,8 +1,9 @@
-import { Juego, IJuego } from '../models/juego.model';
+import { Juego } from '../models/juego.model';
 import { JuegoCategoria, IJuegoCategoria } from '../models/juegoCategoria.model';
 import { Types } from 'mongoose';
 import * as ServiceTypes from "../types/servicio.types";
 import * as ServiceService from "../services/servicio.service";
+import * as JuegoTypes from "../types/juego.types"
 import { Categoria } from '../models/categoria.model';
 import { Dificultad } from '../models/dificultad.model';
 import { Editorial } from '../models/editorial.model';
@@ -10,7 +11,7 @@ import { UsuarioJuego } from "../models/usuariojuego.model"
 import { Usuario } from "../models/usuario.model";
 
 export class JuegoService {
-  async getAllGames(): Promise<IJuego[]> {
+  async getAllGames(): Promise<JuegoTypes.IJuego[]> {
     return await Juego.find()
       .populate('id_dificultad')
       .populate('id_editorial')
@@ -54,10 +55,21 @@ export async function getGameById(idUser: string, id: string) {
     id_juego: formatedIdGame
   });
 
+  const updatedGame = await Juego.findOneAndUpdate(
+    { _id: formatedIdGame },
+    { $set: { visitas: foundGame.visitas + 1 } },
+    { new: true }
+  );
+  if (!updatedGame) {
+    return {
+      result: false,
+      statusCode: 400,
+      messageState: "No se pudo actualizar el numero de visitas del juego."
+    }
+  }
   const flag = (foundUserGame) ? true : false;
-  const gameData = foundGame.toObject() as typeof foundGame & { isFavorite: boolean };
+  const gameData = updatedGame.toObject() as typeof foundGame & { isFavorite: boolean };
   gameData.isFavorite = flag;
-
   return {
     result: true,
     statusCode: 200,
@@ -96,7 +108,7 @@ export async function deleteGameById(id: string, justificacionRetiro: string) {
   }
 }
 
-export async function createGame(idCategory: string, gameInfo: Partial<IJuego>, services: string[]) {
+export async function createGame(idCategory: string, gameInfo: Partial<JuegoTypes.IJuego>, services: string[]) {
   try {
     const foundGame = await Juego.findOne({ titulo: gameInfo.titulo });
     if (foundGame) {

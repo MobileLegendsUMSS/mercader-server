@@ -1,27 +1,7 @@
 import mongoose, { Schema, Document, Types } from 'mongoose';
+import * as JuegoTypes from "../types/juego.types"
 
-export interface IJuego extends Document {
-  titulo: string;
-  descripcion: string;
-  tutorial: string;
-  cant_min_pers: number;
-  cant_max_pers: number;
-  duracion_max: number;
-  duracion_min: number;
-  precio: number;
-  imagen: string;
-  disponible: boolean;
-  activo: boolean;
-  justificacionRetiro?: string 
-  cantidad: number;
-  cantidad_prestamo: number;
-  id_dificultad: Types.ObjectId;
-  id_editorial: Types.ObjectId;
-  createdAt?: Date;
-  updatedAt?: Date;
-}
-
-const JuegoSchema = new Schema<IJuego>(
+const JuegoSchema = new Schema<JuegoTypes.IJuego>(
   {
     titulo: {
       type: String,
@@ -113,6 +93,11 @@ const JuegoSchema = new Schema<IJuego>(
       type: Schema.Types.ObjectId,
       ref: 'Editorial',
       required: [true, 'La editorial es obligatoria']
+    },
+    visitas: {
+      type: Number,
+      required: true,
+      default: 0
     }
   },
   {
@@ -123,12 +108,12 @@ const JuegoSchema = new Schema<IJuego>(
 );
 
 //obtener el rango de jugadores como texto
-JuegoSchema.virtual('rangoJugadores').get(function(this: IJuego) {
+JuegoSchema.virtual('rangoJugadores').get(function(this: JuegoTypes.IJuego) {
   return `${this.cant_min_pers} - ${this.cant_max_pers} jugadores`;
 });
 
 //obtener el rango de duración como texto
-JuegoSchema.virtual('rangoDuracion').get(function(this: IJuego) {
+JuegoSchema.virtual('rangoDuracion').get(function(this: JuegoTypes.IJuego) {
   return `${this.duracion_min} - ${this.duracion_max} minutos`;
 });
 
@@ -140,4 +125,4 @@ JuegoSchema.statics.buscarDisponibles = function() {
   return this.find({ disponible: true, cantidad: { $gt: 0 } });
 };
 
-export const Juego = mongoose.model<IJuego>('Juego', JuegoSchema);
+export const Juego = mongoose.model<JuegoTypes.IJuego>('Juego', JuegoSchema);
