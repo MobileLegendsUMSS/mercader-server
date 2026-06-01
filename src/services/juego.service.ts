@@ -265,3 +265,98 @@ export async function updateGameById(idGame: string, fieldName: string, fieldVal
     };
   }
 }
+
+export async function getMostRecentGames() {
+  try {
+    const today = new Date();
+    const recentLimit = new Date(today.getMonth() - 1);
+
+    const foundGames = await Juego.find({
+      createdAt: { $gte: recentLimit }
+    }, "_id titulo, descripcion, durecion_min, duracion_max, precio, disponible, activo");
+    if (!foundGames || foundGames.length === 0) {
+      return {
+        result: true,
+        statusCode: 200,
+        messageState: "No hay juegos recientemente registrados."
+      };
+    }
+    return {
+      result: true,
+      statusCode: 200,
+      messageState: "Juegos recientemente registrados obtenidos correctamente",
+      data: foundGames
+    }
+  } catch (err) {
+    return {
+      result: false,
+      statusCode: 500,
+      messageState: `Error interno del servidor: ${(err as Error).message}`
+    };
+  }
+}
+
+export async function handleMostGames(
+  allGames: boolean,
+  action: "visited" | "selled" | "borrowed",
+  amount?: number) {
+  try {
+    let magicWord;
+    let sortCondition;    
+    if (action === "visited") {
+      sortCondition = { visitas: -1 as const }
+      magicWord = "visitados"
+    } else if (action === "selled") {
+      sortCondition = { ventas: -1 as const }
+      magicWord = "vendidos"
+    } else {
+      sortCondition = { prestamos: -1 as const }
+      magicWord = "prestados"
+    }
+
+    const foundGames = await Juego.find({
+      }, "_id titulo, descripcion, durecion_min, duracion_max, precio, disponible, activo")
+      .sort(sortCondition);
+    if (!foundGames || foundGames.length === 0) {
+      return {
+        result: true,
+        statusCode: 200,
+        messageState: "No hay juegos que hayan tenido visitas."
+      };
+    }
+
+    let formatedGames;
+    if (allGames && amount) {
+      formatedGames = foundGames.slice(0, amount);
+    } else {
+      formatedGames = foundGames;
+    }
+    const message = (amount)
+      ?  `Los primeros ${amount} juegos mas ${magicWord} se han obtenido correctamente.`
+      :  `Juegos mas ${magicWord} obtenidos correctamente.`
+    return {
+      result: true,
+      statusCode: 200,
+      messageState: message,
+      data: formatedGames
+    };
+  } catch (err) {
+    return {
+      result: false,
+      statusCode: 500,
+      messageState: `Error interno del servidor: ${(err as Error).message}`
+    };
+  }
+}
+
+export async function getMostVisitedGames(allGames: boolean, amount?: number) {
+  return await handleMostGames(allGames, "visited", amount);
+}
+
+export async function getMostSelledGames(allGames: boolean, amount?: number) {
+  return await handleMostGames(allGames, "selled", amount);
+}
+
+export async function getMostBorrowedGames(allGames: boolean, amount?: number) {
+  return await handleMostGames(allGames, "borrowed", amount);
+}

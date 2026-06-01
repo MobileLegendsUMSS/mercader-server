@@ -87,14 +87,14 @@ export async function registerUserLoan(idUser: string, idGame: string, service: 
       
       const updatedGame = await Juego.findOneAndUpdate(
         { _id: formatedIdGame},
-        { $set: { cantidad: foundGame.cantidad - 1, cantidad_prestamo: foundGame.cantidad_prestamo + 1 } },
+        { $set: { cantidad: foundGame.cantidad - 1, cantidad_prestamo: foundGame.cantidad_prestamo + 1, prestamos: foundGame.prestamos + 1 } },
         { new: true }
       );
       if (!updatedGame) {
         return {
           result: false,
           statusCode: 400,
-          messageState: "No se pudo actualizar el stock del juego asociado al prestamo correctamente."
+          messageState: "No se pudo actualizar el stock del juego asociado al prestamo."
         }
       }
       if (updatedGame.cantidad === 0) {

@@ -31,7 +31,7 @@ export async function getGameById(req: Request, res: Response) {
     if (!id || typeof id !== "string") {
       return res.status(400).json({
         success: false,
-        message: 'Id de juego invalido' 
+        message: 'Id de juego invalido.'
       });
     }
     const { result, statusCode, messageState, data } = await GameService.getGameById(id_usuario, id);
@@ -49,7 +49,7 @@ export async function getGameById(req: Request, res: Response) {
     }
     res.status(200).json({
       success: true,
-      data: data 
+      data: data
     });
   } catch (error: any) {
     res.status(500).json({ success: false, error: error.message });
@@ -185,4 +185,96 @@ export async function updateGameById(req: Request, res: Response) {
       message: `Error interno del servidor: ${(err as Error).message}`
     });
   }
+}
+
+export async function getMostRecentGames(req: Request, res: Response) {
+  try {
+    const { result, statusCode, messageState, data } = await GameService.getMostRecentGames();
+    if (!data) {
+      return res.status(statusCode).json({
+        success: result,
+        message: messageState
+      });
+    }
+    return res.status(200).json({
+      success: true,
+      message: "Juegos recientemente registrados obtenidos correctamente",
+      data: data
+    });
+  } catch (err) {
+    return res.status(500).json({
+      success: false,
+      message: `Error interno del servidor: ${(err as Error).message}`
+    });
+  }
+}
+
+export async function handleMostGames(
+  req: Request,
+  res: Response,
+  action: "visited" | "selled" | "borrowed") {
+  try {
+    const { allGames, amount=null } = req.body;
+
+    if (allGames !== null || allGames !== undefined || typeof allGames === "boolean") {
+      return res.status(400).json({
+        result: false,
+        message: "Parametro de muestreo de juegos invalido."
+      });
+    }
+    if (allGames === false) {
+      if (amount || typeof amount !== "number") {
+        return res.status(400).json({
+          result: false,
+          message: "Cantidad de juegos mas visitados invalida."
+        });
+      }
+    } else {
+      if (amount) {
+        return res.status(400).json({
+          result: false,
+          message: "Parametros invalidos."
+        });
+      }
+    }
+
+    let ans;
+    if (action === "visited") {
+      ans = await GameService.getMostVisitedGames(allGames, amount);
+    } else if (action === "selled") {
+      ans = await GameService.getMostSelledGames(allGames, amount);
+    } else {
+      ans = await GameService.getMostBorrowedGames(allGames, amount);
+    }
+    const { result, statusCode, messageState, data } = ans;
+
+    if (!data) {
+      return res.status(statusCode).json({
+        success: result,
+        message: messageState
+      });
+    }
+    return res.status(200).json({
+      success: true,
+      message: messageState,
+      data: data
+    });
+  } catch (err) {
+    return res.status(500).json({
+      success: false,
+      message: `Error interno del servidor: ${(err as Error).message}`
+    });
+  }
+}
+
+export async function getMostVisitedGames(req: Request, res: Response) {
+  return await handleMostGames(req, res, "visited");
+}
+
+export async function getMostSelledGames(req: Request, res: Response) {
+  return await handleMostGames(req, res, "selled");
+}
+
+export async function getMostBorrowedGames(req: Request, res: Response) {
+  return await handleMostGames(req, res, "borrowed");
 }
