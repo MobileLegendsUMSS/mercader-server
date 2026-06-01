@@ -50,6 +50,13 @@ export async function autenticarUsuario(datos: UserTypes.LoginPayload) {
     };
   }
   const getRol = await Rol.findOne({ _id: idRol.id_rol });
+  if (!getRol) {
+    return {
+      result: false,
+      statusCode: 404,
+      messageState: "Rol no encontrado"
+    };
+  }
   // por alguna razon lo marca en rojo el getRol, pero esta bien es del ts el error, no es un error real
   let rolName = getRol.nombre_rol;
   return {
@@ -64,14 +71,14 @@ export async function autenticarUsuario(datos: UserTypes.LoginPayload) {
 };
 
 export class UsuarioService {
-  async getUsuario(): Promise<IUsuario[]> {
+  async getUsuario(){
     return await Usuario.find()
       .populate('id_dificultad')
       .populate('id_editorial')
       .exec();
   }
 
-  async getUsuarioById(id: string): Promise<IUsuario | null> {
+  async getUsuarioById(id: string){
     if (!Types.ObjectId.isValid(id)) return null;
     return await Usuario.findById(id)
       .populate('id_dificultad')
