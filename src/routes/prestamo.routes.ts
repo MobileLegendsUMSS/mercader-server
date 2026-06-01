@@ -4,10 +4,9 @@ import * as Autorizacion from "../middlewares/autenticacion.middleware";
 
 const router = Router();
 
-router.post("/usuarios/prestamo", Autorizacion.autenticarToken, PrestamoController.registerUserLoan);
-
 router.get("/usuarios/prestamos", Autorizacion.autenticarToken, PrestamoController.getUserLoans);
-router.post("/usuarios/prestamos", Autorizacion.autenticarToken, PrestamoController.getUserLoans);
+
+router.post("/usuarios/prestamo", Autorizacion.autenticarToken, PrestamoController.registerUserLoan);
 
 router.patch("/admin/prestamo", Autorizacion.autenticarToken, PrestamoController.updateUserLoan);
 

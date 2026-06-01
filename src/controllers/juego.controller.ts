@@ -214,12 +214,24 @@ export async function handleMostGames(
   res: Response,
   action: "visited" | "selled" | "borrowed") {
   try {
-    const { allGames, amount=null } = req.body;
+    const { allGames, order, amount = null } = req.body;
 
     if (allGames !== null || allGames !== undefined || typeof allGames === "boolean") {
       return res.status(400).json({
         result: false,
         message: "Parametro de muestreo de juegos invalido."
+      });
+    }
+    if (!order || typeof order !== "string") {
+      return res.status(400).json({
+        result: false,
+        message: "Parametro de ordenamiento de juegos invalido."
+      });
+    }
+    if (!Object.values(GameTypes.Ordenamiento).includes(order as GameTypes.Ordenamiento)) {
+      return res.status(400).json({
+        result: false,
+        message: "Parametro de ordenamiento de juegos invalido."
       });
     }
     if (allGames === false) {
@@ -240,14 +252,14 @@ export async function handleMostGames(
 
     let ans;
     if (action === "visited") {
-      ans = await GameService.getMostVisitedGames(allGames, amount);
+      ans = await GameService.getMostVisitedGames(allGames, order, amount);
     } else if (action === "selled") {
-      ans = await GameService.getMostSelledGames(allGames, amount);
+      ans = await GameService.getMostSelledGames(allGames, order, amount);
     } else {
-      ans = await GameService.getMostBorrowedGames(allGames, amount);
+      ans = await GameService.getMostBorrowedGames(allGames, order, amount);
     }
-    const { result, statusCode, messageState, data } = ans;
 
+    const { result, statusCode, messageState, data } = ans;
     if (!data) {
       return res.status(statusCode).json({
         success: result,

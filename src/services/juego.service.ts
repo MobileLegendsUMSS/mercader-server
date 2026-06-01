@@ -176,7 +176,7 @@ export async function updateGameById(idGame: string, fieldName: string, fieldVal
     }
 
     if (fieldName === "categoria") {
-      const foundCategory = await Categoria.findOne({ descripcion: fieldValue });
+      const foundCategory = await Categoria.findOne({ descripcion: fieldValue as string });
       if (!foundCategory) {
         return {
           result: false,
@@ -298,24 +298,31 @@ export async function getMostRecentGames() {
 
 export async function handleMostGames(
   allGames: boolean,
+  order: string,
   action: "visited" | "selled" | "borrowed",
   amount?: number) {
   try {
     let magicWord;
     let sortCondition;    
     if (action === "visited") {
-      sortCondition = { visitas: -1 as const }
+      sortCondition = (order === JuegoTypes.Ordenamiento.ASCENDENTE)
+        ? { visitas: 1 as const }
+        : { visitas: -1 as const }
       magicWord = "visitados"
     } else if (action === "selled") {
-      sortCondition = { ventas: -1 as const }
+      sortCondition = (order === JuegoTypes.Ordenamiento.ASCENDENTE)
+        ? { ventas: 1 as const }
+        : { ventas: -1 as const }
       magicWord = "vendidos"
     } else {
-      sortCondition = { prestamos: -1 as const }
+      sortCondition = (order === JuegoTypes.Ordenamiento.ASCENDENTE)
+        ? { prestamos: 1 as const }
+        : { prestamos: -1 as const }
       magicWord = "prestados"
     }
 
     const foundGames = await Juego.find({
-      }, "_id titulo, descripcion, durecion_min, duracion_max, precio, disponible, activo")
+      }, "_id titulo descripcion durecion_min duracion_max precio disponible activo")
       .sort(sortCondition);
     if (!foundGames || foundGames.length === 0) {
       return {
@@ -327,6 +334,13 @@ export async function handleMostGames(
 
     let formatedGames;
     if (allGames && amount) {
+      if (amount < 0 || amount > foundGames.length) {
+        return {
+          result: false,
+          statusCode: 400,
+          messageState: "Cantidad invalida."
+        };
+      }
       formatedGames = foundGames.slice(0, amount);
     } else {
       formatedGames = foundGames;
@@ -349,14 +363,14 @@ export async function handleMostGames(
   }
 }
 
-export async function getMostVisitedGames(allGames: boolean, amount?: number) {
-  return await handleMostGames(allGames, "visited", amount);
+export async function getMostVisitedGames(allGames: boolean, order: string, amount?: number) {
+  return await handleMostGames(allGames, order, "visited", amount);
 }
 
-export async function getMostSelledGames(allGames: boolean, amount?: number) {
-  return await handleMostGames(allGames, "selled", amount);
+export async function getMostSelledGames(allGames: boolean, order: string, amount?: number) {
+  return await handleMostGames(allGames, order, "selled", amount);
 }
 
-export async function getMostBorrowedGames(allGames: boolean, amount?: number) {
-  return await handleMostGames(allGames, "borrowed", amount);
+export async function getMostBorrowedGames(allGames: boolean, order: string, amount?: number) {
+  return await handleMostGames(allGames, order, "borrowed", amount);
 }

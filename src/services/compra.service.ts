@@ -72,7 +72,7 @@ export async function registerUserPurchase(idUser: string, idPayMethod: string) 
         _id: cartGame.id_juego,
         activo: true,
         cantidad: { $ne: 0 }
-      }, "cantidad");
+      }, "cantidad ventas");
       if (!foundGame) {
         return {
           result: false,

@@ -18,7 +18,7 @@ export async function registerUserLoan(req: Request, res: Response) {
         message: "Id de usuario o juego invalido."
       });
     }
-    if (!servicio || typeof servicio !== "string" || 
+    if (!servicio || typeof servicio !== "string" ||
       (!Object.values(ServicioTypes.TipoServicio).includes(servicio as ServicioTypes.TipoServicio))) {
       return res.status(400).json({
         success: false,
@@ -71,7 +71,7 @@ export async function registerUserLoan(req: Request, res: Response) {
     return res.status(200).json({
       success: true,
       message: "El prestamo se ha registrado exitosamente."
-    }); 
+    });
   } catch (err) {
     return res.status(500).json({
       success: false,
@@ -84,7 +84,7 @@ export async function getUserLoans(req: Request, res: Response) {
   try {
     const { id_usuario } = req.user as TokenTypes.TokenPayload;
     const { vigent, collected, returned } = req.body;
-    
+
     if (!id_usuario || typeof id_usuario !== "string") {
       return res.status(400).json({
         success: false,
@@ -140,7 +140,7 @@ export async function updateUserLoan(req: Request, res: Response) {
   try {
     const { id_usuario } = req.user as TokenTypes.TokenPayload;
     const { id_prestamo } = req.query;
-    const { fecha_inicio, fecha_fin } = req.body; 
+    const { fecha_inicio, fecha_fin } = req.body;
 
     if (!id_usuario || typeof id_usuario !== "string") {
       return res.status(400).json({
@@ -182,7 +182,7 @@ export async function updateUserLoan(req: Request, res: Response) {
       }
       if (endDate > today) {
         return res.status(400).json({
-          success: false, 
+          success: false,
           message: "La fecha de fin de prestamo no puede ser futura."
         });
       }
@@ -206,7 +206,7 @@ export async function updateUserLoan(req: Request, res: Response) {
     return res.status(500).json({
       success: false,
       message: `Error interno del servidor: ${(err as Error).message}`
-    }); 
+    });
   }
 }
 
@@ -243,6 +243,6 @@ export async function deleteUserLoan(req: Request, res: Response) {
     return res.status(500).json({
       success: false,
       message: `Error interno del servidor: ${(err as Error).message}`
-    }); 
+    });
   }
 }
