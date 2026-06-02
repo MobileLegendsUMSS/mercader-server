@@ -274,7 +274,7 @@ export async function getMostRecentGames() {
 
     const foundGames = await Juego.find({
       createdAt: { $gte: recentLimit }
-    }, "_id titulo, descripcion, durecion_min, duracion_max, precio, disponible, activo");
+    }, "_id titulo descripcion durecion_min duracion_max precio disponible activo");
     if (!foundGames || foundGames.length === 0) {
       return {
         result: true,
