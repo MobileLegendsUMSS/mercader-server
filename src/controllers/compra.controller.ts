@@ -1,11 +1,12 @@
 import { Request, Response } from "express";
-import * as CompraService from "../services/compra.service";
 import * as TokenTypes from "../types/token.types";
+import * as CompraService from "../services/compra.service";
 
 export async function registerUserPurchase(req: Request, res: Response) {
   try {
     const { id_usuario } = req.user as TokenTypes.TokenPayload;
     const { id_metodo_pago } = req.body;
+    const comprobante = req.file as Express.Multer.File;
 
     if ((!id_usuario || typeof id_usuario !== "string") ||
       (!id_metodo_pago || typeof id_metodo_pago !== "string")) {
@@ -14,8 +15,14 @@ export async function registerUserPurchase(req: Request, res: Response) {
         message: "Id de usuario o metodo de pago invalido."
       });
     }
+    if (!comprobante || (comprobante && !comprobante.mimetype.startsWith("image/"))) {
+      return res.status(400).json({
+        success: false,
+        message: "Imagen de comprobante de pago invalida."
+      });
+    }
 
-    const { result, statusCode, messageState } = await CompraService.registerUserPurchase(id_usuario, id_metodo_pago);
+    const { result, statusCode, messageState } = await CompraService.registerUserPurchase(id_usuario, id_metodo_pago, comprobante);
     if (!result) {
       return res.status(statusCode).json({
         success: false,

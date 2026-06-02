@@ -3,6 +3,7 @@ import { JuegoService } from '../services/juego.service';
 import * as ServiceTypes from "../types/servicio.types";
 import * as TokenTypes from "../types/token.types";
 import * as GameTypes from "../types/juego.types";
+import * as ReporteTypes from "../types/reporte.types";
 import * as GameService from "../services/juego.service";
 
 const juegoService = new JuegoService();
@@ -228,7 +229,7 @@ export async function handleMostGames(
         message: "Parametro de ordenamiento de juegos invalido."
       });
     }
-    if (!Object.values(GameTypes.Ordenamiento).includes(order as GameTypes.Ordenamiento)) {
+    if (!Object.values(ReporteTypes.Ordenamiento).includes(order as ReporteTypes.Ordenamiento)) {
       return res.status(400).json({
         result: false,
         message: "Parametro de ordenamiento de juegos invalido."

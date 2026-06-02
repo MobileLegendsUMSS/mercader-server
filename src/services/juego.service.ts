@@ -4,6 +4,7 @@ import { Types } from 'mongoose';
 import * as ServiceTypes from "../types/servicio.types";
 import * as ServiceService from "../services/servicio.service";
 import * as JuegoTypes from "../types/juego.types"
+import * as ReporteTypes from "../types/reporte.types";
 import { Categoria } from '../models/categoria.model';
 import { Dificultad } from '../models/dificultad.model';
 import { Editorial } from '../models/editorial.model';
@@ -305,17 +306,17 @@ export async function handleMostGames(
     let magicWord;
     let sortCondition;    
     if (action === "visited") {
-      sortCondition = (order === JuegoTypes.Ordenamiento.ASCENDENTE)
+      sortCondition = (order === ReporteTypes.Ordenamiento.ASCENDENTE)
         ? { visitas: 1 as const }
         : { visitas: -1 as const }
       magicWord = "visitados"
     } else if (action === "selled") {
-      sortCondition = (order === JuegoTypes.Ordenamiento.ASCENDENTE)
+      sortCondition = (order === ReporteTypes.Ordenamiento.ASCENDENTE)
         ? { ventas: 1 as const }
         : { ventas: -1 as const }
       magicWord = "vendidos"
     } else {
-      sortCondition = (order === JuegoTypes.Ordenamiento.ASCENDENTE)
+      sortCondition = (order === ReporteTypes.Ordenamiento.ASCENDENTE)
         ? { prestamos: 1 as const }
         : { prestamos: -1 as const }
       magicWord = "prestados"

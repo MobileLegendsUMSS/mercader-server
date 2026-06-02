@@ -22,4 +22,16 @@ router.get(
   ReportesController.getCategoryPopularity
 );
 
+router.get(
+  "/superadmin/ingresos-periodo",
+  Autorizacion.autenticarToken,
+  ReportesController.getIncomePerPeriod
+);
+
+router.get(
+  "/superadmin/usos-periodo",
+  Autorizacion.autenticarToken,
+  ReportesController.getBorrowsPerPeriod
+);
+
 export default router;

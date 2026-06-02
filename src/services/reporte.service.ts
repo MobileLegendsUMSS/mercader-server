@@ -5,7 +5,12 @@ import { PrestamoJuego } from "../models/prestamojuego.model";
 import { Juego } from "../models/juego.model";
 import { JuegoCategoria } from "../models/juegoCategoria.model";
 import { Categoria } from "../models/categoria.model";
-import * as JuegoTypes from "../types/juego.types";
+import { Compra } from "../models/compra.model";
+import { yearToDate, monthToDate } from "../utils/date.helper";
+import * as CompraTypes from "../types/compras.types";
+import * as PrestamoTypes from "../types/prestamos.types";
+import * as ServicioTypes from "../types/servicio.types";
+import * as ReportesTypes from "../types/reporte.types";
 
 export async function getTop5MostUsedGamesByUser(idUser: string) {
   try {
@@ -87,12 +92,12 @@ export async function getGamesByStock(
   order: string,
   amount?: number) {
   try {
-    const sortCondition = (order === JuegoTypes.Ordenamiento.ASCENDENTE) 
-      ? { cantidad: 1 as const } 
+    const sortCondition = (order === ReportesTypes.Ordenamiento.ASCENDENTE)
+      ? { cantidad: 1 as const }
       : { cantidad: -1 as const };
 
     const foundGames = await Juego.find({
-      }, "_id titulo descripcion cantidad cantidad_prestamo disponible activo")
+    }, "_id titulo descripcion cantidad cantidad_prestamo disponible activo")
       .sort(sortCondition);
     if (!foundGames || foundGames.length === 0) {
       return {
@@ -116,8 +121,8 @@ export async function getGamesByStock(
       formatedGames = foundGames;
     }
     const message = (amount)
-      ?  `Los primeros ${amount} juegos obtenido correctamente por stock.`
-      :  `Juegos obtenidos correctamente por stock.`
+      ? `Los primeros ${amount} juegos obtenido correctamente por stock.`
+      : `Juegos obtenidos correctamente por stock.`
     return {
       result: true,
       statusCode: 200,
@@ -169,7 +174,7 @@ export async function getCategiryPopularity() {
         _id: idCategory
       }, "descripcion");
       if (currentCategory) {
-        const categoryInfo = { descripcion: currentCategory.descripcion, frecuencia: (count/categoryLength) * 100 };
+        const categoryInfo = { descripcion: currentCategory.descripcion, frecuencia: (count / categoryLength) * 100 };
         categories.push(categoryInfo);
       }
     }
@@ -187,4 +192,118 @@ export async function getCategiryPopularity() {
       messageState: `Error interno en el servidor: ${(err as Error).message}`
     };
   }
+}
+
+export async function handlePerPeriod(
+  timePeriod: string,
+  timeValue: string,
+  action: "sells" | "borrows") {
+  try {
+    let foundGames;
+    let magicWord;
+    let startDate;
+    let endDate;
+    if (timePeriod === ReportesTypes.PeriodoTiempo.ANIO) {
+      startDate = yearToDate(timeValue);
+      if (isNaN(startDate.getTime())) {
+        return {
+          result: false,
+          statusCode: 400,
+          messageState: "Fecha invalida."
+        };
+      }
+      endDate = new Date(startDate);
+      endDate.setFullYear(endDate.getFullYear() + 1);
+      endDate.setDate(endDate.getDate() - 1);
+      magicWord = "anuales";
+    } else if (timePeriod === ReportesTypes.PeriodoTiempo.MES) {
+      startDate = monthToDate(timeValue);
+      if (isNaN(startDate.getTime())) {
+        return {
+          result: false,
+          statusCode: 400,
+          messageState: "Fecha invalida."
+        };
+      }
+      endDate = new Date(startDate);
+      endDate.setMonth(endDate.getMonth() + 1);
+      endDate.setDate(endDate.getDate() - 1);
+      magicWord = "mensuales";
+    } else {
+      startDate = new Date(timeValue);
+      if (isNaN(startDate.getTime())) {
+        return {
+          result: false,
+          statusCode: 400,
+          messageState: "Fecha invalida."
+        };
+      }
+      endDate = new Date(startDate);
+      endDate.setDate(endDate.getDate() + 1);
+      endDate.setMilliseconds(-1);
+      magicWord = "diarios";
+    }
+
+
+    let foundServices;
+    if (action === "sells") {
+      foundServices = await Compra.find({
+        createdAt: { $gte: startDate, $lte: endDate }
+      }, "total").select("-comprobante");
+    } else {
+      foundServices = await PrestamoJuego.find({
+        createdAt: { $gte: startDate, $lte: endDate },
+      }, "servicio");
+    }
+
+    if (!foundServices || foundServices.length === 0) {
+      return {
+        result: true,
+        statusCode: 200,
+        messageState: "No hay ingresos registrados."
+      };
+    }
+
+    let serviceInfo;
+    if (action === "sells") {
+      let totalIncome = 0;
+      (foundServices as CompraTypes.ICompra[]).forEach(purchase => {
+        totalIncome = totalIncome + purchase.total
+      });
+      serviceInfo = { ganancia: totalIncome };
+    } else {
+      const totalBorrows = foundServices.length;
+      let countLoans = 0;
+      let countRents = 0;
+      (foundServices as PrestamoTypes.IPrestamoJuego[]).forEach(borrow => {
+        if (borrow.servicio === ServicioTypes.TipoServicio.PRESTAMO) {
+          countLoans = countLoans + 1;
+        }
+        if (borrow.servicio === ServicioTypes.TipoServicio.ALQUILER) {
+          countRents = countRents + 1;
+        }
+      });
+      serviceInfo = { prestamos_totales: totalBorrows, prestamos: countLoans, alquileres: countRents };
+    }
+    return {
+      result: true,
+      statusCode: 200,
+      messageState: `Ingresos ${magicWord} obtenidos correctamente.`,
+      data: serviceInfo
+    }
+  } catch (err) {
+    return {
+      result: false,
+      statusCode: 500,
+      messageState: `Error interno en el servidor: ${(err as Error).message}`
+    };
+  }
+}
+
+export async function getIncomePerPeriod(timePeriod: string, timeValue: string) {
+  return await handlePerPeriod(timePeriod, timeValue, "sells");
+}
+
+export async function getBorrowsPerPeriod(timePeriod: string, timeValue: string) {
+  return await handlePerPeriod(timePeriod, timeValue, "borrows"); 
 }

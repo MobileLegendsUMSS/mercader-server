@@ -23,6 +23,10 @@ const purchaseSchema = new Schema<CompraTypes.ICompra>(
       required: true,
       min: [1, "El total no puede ser negativo ni igual a 0."],
       default: 1
+    },
+    comprobante: {
+      type: Buffer,
+      required: true,
     }
   },
   {
