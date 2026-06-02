@@ -6,7 +6,10 @@ import { CarritoJuego } from "../models/carritojuego.model";
 import { Compra } from "../models/compra.model";
 import { MetodoPago } from "../models/metodopago.model";
 
-export async function registerUserPurchase(idUser: string, idPayMethod: string) {
+export async function registerUserPurchase(
+  idUser: string,
+  idPayMethod: string,
+  paymentProof: Express.Multer.File) {
   try {
     const formatedIdUser = new Types.ObjectId(idUser);
     const foundUser = await Usuario.findById(formatedIdUser);
@@ -118,7 +121,8 @@ export async function registerUserPurchase(idUser: string, idPayMethod: string) 
       id_usuario: formatedIdUser,
       id_carrito: cartId,
       id_metodo_pago: formatedIdPayMethod,
-      total: precio_acumulado 
+      total: precio_acumulado,
+      comprobante: paymentProof.buffer
     };
     const registeredPurchase = await Compra.create(newPurchase);
     if (!registeredPurchase) {
@@ -156,7 +160,7 @@ export async function getUserPurchases(idUser: string) {
 
     const foundPurchases = await Compra.find({
       id_usuario: formatedIdUser,
-    }, "_id id_carrito id_metodo_pago total");
+    }, "_id id_carrito id_metodo_pago total").select("-comprobante");
     if (!foundPurchases || foundPurchases.length === 0) {
       return {
         result: true,

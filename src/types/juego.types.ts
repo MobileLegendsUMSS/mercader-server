@@ -52,8 +52,3 @@ export const stringFields: (keyof GameStringItems)[] = [
   'titulo', 'descripcion', 'tutorial',
   'categoria', 'dificultad', 'editorial'
 ];
-
-export enum Ordenamiento {
-  ASCENDENTE =  "ascendente",
-  DESCENDENTE = "descendente"
-}

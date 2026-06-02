@@ -391,3 +391,82 @@ export async function deleteUserLoan(idLoan: string, idUser: string) {
     };
   }
 }
+
+export async function getAllLoans(vigent: boolean, collected: boolean, returned: boolean) {
+  try {
+    let findCondition = {};
+    let magicWord = "";
+    if (vigent) {
+      Object.assign(findCondition, { fecha_limite: { $gt: new Date() }, fecha_fin: { $exists: false } });
+      magicWord += "vigentes/";
+    }
+    if (collected) {
+      Object.assign(findCondition, { fecha_inicio: { $exists: true } });
+      magicWord += "regogidos/";
+    }
+    if (returned) {
+      Object.assign(findCondition, { fecha_fin: { $exists: true } });
+      magicWord += "devueltos"
+    }
+    const foundLoans = await Prestamo.find(findCondition);
+    if (!foundLoans || foundLoans.length === 0) {
+      return {
+        result: true,
+        statusCode: 200,
+        messageState: `El usuario no tiene prestamos ${magicWord} registrados.`
+      };
+    }
+
+    const data = [];
+    for (const loan of foundLoans) {
+      const foundLoanGame = await PrestamoJuego.findOne({
+        id_prestamo: loan._id
+      }, "id_juego servicio");
+      if (!foundLoanGame) {
+        return {
+          result: false,
+          statusCode: 404,
+          messageState: "No se ha encontrado el juego que esta asociado al prestamo."
+        };
+      }
+      const foundGame = await Juego.findOne({
+        _id: foundLoanGame.id_juego,
+        activo: true
+      }, "titulo descripccion");
+      if (!foundGame) {
+        return {
+          result: false,
+          statusCode: 404,
+          messageState: "El juego asociado al prestamo no existe o no esta disponible."
+        };
+      }
+      const loanInfo = {
+        id_prestamo: loan._id,
+        titulo: foundGame.titulo,
+        descripcion: foundGame.descripcion,
+        servicio: foundLoanGame.servicio,
+        fecha_solicitud: new Date((loan.fecha_solicitud).getTime() - (4 * 60 * 60 * 1000)),
+        fecha_limite: new Date((loan.fecha_limite).getTime() - (4 * 60 * 60 * 1000))
+      };
+      if (loan.fecha_inicio) {
+        Object.assign(loanInfo, { fecha_inicio: (new Date((loan.fecha_inicio).getTime() - (4 * 60 * 60 * 1000))) });
+      }
+      if (loan.fecha_fin) {
+        Object.assign(loanInfo, { fecha_fin: (new Date((loan.fecha_fin).getTime() - (4 * 60 * 60 * 1000))) });
+      }
+      data.push(loanInfo);
+    }
+    return {
+      result: true,
+      statusCode: 200,
+      messageState: "Prestamos del usuario obtenidos exitosamente.",
+      data: data
+    }
+  } catch (err) {
+    return {
+      result: false,
+      statusCode: 500,
+      messageState: `Error interno en el servidor: ${(err as Error).message}`
+    };
+  }
+}

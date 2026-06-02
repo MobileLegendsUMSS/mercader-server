@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import * as TokenTypes from "../types/token.types";
-import * as JuegoTypes from "../types/juego.types";
+import * as ReportesTypes from "../types/reporte.types";
 import * as ReportesService from "../services/reporte.service";
 
 export async function getTop5MostUsedGamesByUser(req: Request, res: Response) {
@@ -42,7 +42,7 @@ export async function getTop5MostUsedGamesByUser(req: Request, res: Response) {
 
 export async function getGamesByStock(req: Request, res: Response) {
   try {
-    const { allGames, order, amount=null } = req.body;
+    const { allGames, order, amount = null } = req.body;
 
     if (allGames !== null || allGames !== undefined || typeof allGames === "boolean") {
       return res.status(400).json({
@@ -56,7 +56,7 @@ export async function getGamesByStock(req: Request, res: Response) {
         message: "Parametro de ordenamiento de juegos invalido."
       });
     }
-    if (!Object.values(JuegoTypes.Ordenamiento).includes(order as JuegoTypes.Ordenamiento)) {
+    if (!Object.values(ReportesTypes.Ordenamiento).includes(order as ReportesTypes.Ordenamiento)) {
       return res.status(400).json({
         result: false,
         message: "Parametro de ordenamiento de juegos invalido."
@@ -118,4 +118,65 @@ export async function getCategoryPopularity(req: Request, res: Response) {
       message: `Error interno del servidor: ${(err as Error).message}`
     });
   }
+}
+
+export async function handlePerPeriod(
+  req: Request,
+  res: Response,
+  action: "sells" | "borrows") {
+  try {
+    const { timePeriod, timeValue } = req.body;
+
+    if (!timePeriod || typeof timePeriod !== "string") {
+      return res.status(400).json({
+        success: false,
+        message: "Periodo de tiempo invalido."
+      });
+    }
+    if (!Object.values(ReportesTypes.PeriodoTiempo).includes(timePeriod as ReportesTypes.PeriodoTiempo)) {
+      return res.status(400).json({
+        result: false,
+        message: "Periodo de tiempo invalido."
+      });
+    }
+    if (!timeValue) {
+      return res.status(400).json({
+        result: false,
+        message: "Fecha de reporte invalida."
+      });
+    }
+
+    let ans;
+    if (action === "sells") {
+      ans = await ReportesService.getIncomePerPeriod(timePeriod, timeValue);
+    } else {
+      ans = await ReportesService.getBorrowsPerPeriod(timePeriod, timeValue);
+    }
+
+    const { result, statusCode, messageState, data } = ans;
+    if (!result) {
+      return res.status(statusCode).json({
+        success: false,
+        message: messageState
+      });
+    }
+    return res.status(200).json({
+      success: true,
+      message: messageState,
+      data: data
+    });
+  } catch (err) {
+    return res.status(500).json({
+      success: false,
+      message: `Error interno del servidor: ${(err as Error).message}`
+    });
+  }
+}
+
+export async function getIncomePerPeriod(req: Request, res: Response) {
+  return await handlePerPeriod(req, res, "sells");
+}
+
+export async function getBorrowsPerPeriod(req: Request, res: Response){
+  return await handlePerPeriod(req, res, "borrows");
 }

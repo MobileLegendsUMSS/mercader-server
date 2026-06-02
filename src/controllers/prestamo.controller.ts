@@ -246,3 +246,52 @@ export async function deleteUserLoan(req: Request, res: Response) {
     });
   }
 }
+
+export async function getAllLoans(req: Request, res: Response) {
+  try {
+    const { vigent, collected, returned } = req.body;
+
+    if (vigent === null || vigent === undefined || typeof vigent !== "boolean") {
+      return res.status(400).json({
+        success: false,
+        message: "Estado de vigencia de prestamo invalido."
+      });
+    }
+    if (collected === null || collected === undefined || typeof collected !== "boolean") {
+      return res.status(400).json({
+        success: false,
+        message: "Estado de recoleccion de prestamo invalido."
+      });
+    }
+    if (returned === null || returned === undefined || typeof returned !== "boolean") {
+      return res.status(400).json({
+        success: false,
+        message: "Estado de devolucion de prestamo invalido."
+      });
+    }
+
+    const { result, statusCode, messageState, data } = await PrestamoService.getAllLoans(vigent, collected, returned);
+    if (!result) {
+      return res.status(statusCode).json({
+        success: false,
+        message: messageState
+      });
+    }
+    if (!data || data.length === 0) {
+      return res.status(200).json({
+        success: true,
+        message: "El usuario no tiene prestamos vigentes registrados."
+      });
+    }
+    return res.status(200).json({
+      success: true,
+      message: "Prestamos del usuario obtenidos exitosamente.",
+      data: data
+    });
+  } catch (err) {
+    return res.status(500).json({
+      success: false,
+      message: `Error interno del servidor: ${(err as Error).message}`
+    });
+  }
+}
