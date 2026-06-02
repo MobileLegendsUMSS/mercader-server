@@ -236,7 +236,7 @@ export async function handleMostGames(
       });
     }
     if (allGames === false) {
-      if (amount || typeof amount !== "number") {
+      if (!amount || typeof amount !== "number") {
         return res.status(400).json({
           result: false,
           message: "Cantidad de juegos mas visitados invalida."
