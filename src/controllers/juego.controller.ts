@@ -217,7 +217,7 @@ export async function handleMostGames(
   try {
     const { allGames, order, amount = null } = req.body;
 
-    if (allGames !== null || allGames !== undefined || typeof allGames === "boolean") {
+    if (allGames === null || allGames === undefined || typeof allGames === "boolean") {
       return res.status(400).json({
         result: false,
         message: "Parametro de muestreo de juegos invalido."
