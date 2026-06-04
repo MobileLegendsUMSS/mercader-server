@@ -305,25 +305,29 @@ export async function handleMostGames(
   try {
     let magicWord;
     let sortCondition;    
+    let atribute;
     if (action === "visited") {
       sortCondition = (order === ReporteTypes.Ordenamiento.ASCENDENTE)
         ? { visitas: 1 as const }
         : { visitas: -1 as const }
-      magicWord = "visitados"
+      magicWord = "visitados";
+      atribute = "visitas";
     } else if (action === "selled") {
       sortCondition = (order === ReporteTypes.Ordenamiento.ASCENDENTE)
         ? { ventas: 1 as const }
         : { ventas: -1 as const }
-      magicWord = "vendidos"
+      magicWord = "vendidos";
+      atribute = "ventas";
     } else {
       sortCondition = (order === ReporteTypes.Ordenamiento.ASCENDENTE)
         ? { prestamos: 1 as const }
         : { prestamos: -1 as const }
       magicWord = "prestados"
+      atribute = "prestamos"
     }
 
     const foundGames = await Juego.find({
-      }, "_id titulo descripcion durecion_min duracion_max precio disponible activo")
+      }, `_id titulo descripcion durecion_min duracion_max precio disponible activo ${atribute}`)
       .sort(sortCondition);
     if (!foundGames || foundGames.length === 0) {
       return {
