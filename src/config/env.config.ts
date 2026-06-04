@@ -17,4 +17,7 @@ export const env = {
   DB_PASSWORD: verifyEnvVariable("DB_PASSWORD", undefined),
   DB_URL: verifyEnvVariable("DB_URL", undefined),
   JWT_SECRET: verifyEnvVariable("JWT_SECRET", undefined),
+  CLOUDINARY_CLOUD_NAME: verifyEnvVariable("CLOUDINARY_CLOUD_NAME", undefined),
+  CLOUDINARY_API_KEY: verifyEnvVariable("CLOUDINARY_API_KEY", undefined),
+  CLOUDINARY_API_SECRET: verifyEnvVariable("CLOUDINARY_API_SECRET", undefined),
 };

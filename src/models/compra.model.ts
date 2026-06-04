@@ -24,8 +24,13 @@ const purchaseSchema = new Schema<CompraTypes.ICompra>(
       min: [1, "El total no puede ser negativo ni igual a 0."],
       default: 1
     },
+    estado: {
+      type: String,
+      required: [true, "Estado de la compra requerido."],
+      default: CompraTypes.PurchaseState.PENDIENTE
+    },
     comprobante: {
-      type: Buffer,
+      type: String,
       required: true,
     }
   },
