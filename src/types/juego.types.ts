@@ -22,6 +22,7 @@ export interface IJuego extends Document {
   visitas: number;
   ventas: number;
   prestamos: number;
+  portada: string;
 }
 
 export interface GameNumericItems {

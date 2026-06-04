@@ -2,6 +2,7 @@ import { Router } from 'express';
 import * as GameController from "../controllers/juego.controller";
 import * as Autenticacion from "../middlewares/autenticacion.middleware";
 import * as Autorizacion from "../middlewares/autorizacion.middleware";
+import * as MulterCheck from "../middlewares/multer.middleware";
 
 const router = Router();
 
@@ -45,6 +46,7 @@ router.post(
   "/",
   Autenticacion.autenticarToken,
   Autorizacion.verifyAllowedRoles(["admin", "superadmin"]),
+  MulterCheck.checkGameImageErrors,
   GameController.createGame
 );
 
@@ -59,6 +61,7 @@ router.patch(
   "/",
   Autenticacion.autenticarToken,
   Autorizacion.verifyAllowedRoles(["admin", "superadmin"]),
+  MulterCheck.checkGameImageErrors,
   GameController.updateGameById
 );
 

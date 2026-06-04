@@ -108,6 +108,10 @@ const JuegoSchema = new Schema<JuegoTypes.IJuego>(
       type: Number,
       required: true,
       default: 0
+    },
+    portada: {
+      type: String,
+      required: [true, "La foto de portada del juego es obligatoria."]
     }
   },
   {
