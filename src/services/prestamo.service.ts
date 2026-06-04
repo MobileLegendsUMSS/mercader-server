@@ -216,24 +216,12 @@ export async function getUserLoans(idUser: string, vigent: boolean, collected: b
 
 export async function updateUserLoan(
   idLoan: string,
-  idUser: string,
   startDate: Date | undefined,
   endDate?: Date) {
   try {
-    const formatedIdUser = new Types.ObjectId(idUser);
-    const foundUser = await Usuario.findById(formatedIdUser);
-    if (!foundUser) {
-      return {
-        result: false,
-        statusCode: 404,
-        messageState: "Usuario no encontrado."
-      };
-    }
-
     const formatedIdLoan = new Types.ObjectId(idLoan);
     const foundLoan = await Prestamo.findOne({
-      _id: formatedIdLoan,
-      id_usuario: formatedIdUser
+      _id: formatedIdLoan
     });
     if (!foundLoan) {
       return {
@@ -332,22 +320,11 @@ export async function updateUserLoan(
   }
 }
 
-export async function deleteUserLoan(idLoan: string, idUser: string) {
+export async function deleteUserLoan(idLoan: string) {
   try {
-    const formatedIdUser = new Types.ObjectId(idUser);
-    const foundUser = await Usuario.findById(formatedIdUser);
-    if (!foundUser) {
-      return {
-        result: false,
-        statusCode: 404,
-        messageState: "Usuario no encontrado."
-      };
-    }
-
     const formatedIdLoan = new Types.ObjectId(idLoan);
     const foundLoan = await Prestamo.findOne({
       _id: formatedIdLoan,
-      id_usuario: formatedIdUser
     });
     if (!foundLoan) {
       return {
