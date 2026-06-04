@@ -1,36 +1,39 @@
 import { Router } from "express";
+import * as Autenticacion from "../middlewares/autenticacion.middleware"
+import * as Autorizacion from "../middlewares/autorizacion.middleware";
 import * as PrestamoController from "../controllers/prestamo.controller";
-import * as Autorizacion from "../middlewares/autenticacion.middleware";
 
 const router = Router();
 
 router.get(
   "/usuarios/prestamos",
-  Autorizacion.autenticarToken,
+  Autenticacion.autenticarToken,
   PrestamoController.getUserLoans
 );
 
 router.post(
   "/usuarios/prestamo",
-  Autorizacion.autenticarToken,
+  Autenticacion.autenticarToken,
   PrestamoController.registerUserLoan
 );
 
 router.patch(
   "/admin/prestamo",
-  Autorizacion.autenticarToken,
+  Autenticacion.autenticarToken,
+  Autorizacion.verifyAllowedRoles(["admin"]),
   PrestamoController.updateUserLoan
 );
 
 router.delete(
   "/usuarios/prestamo",
-  Autorizacion.autenticarToken,
+  Autenticacion.autenticarToken,
   PrestamoController.deleteUserLoan
 );
 
 router.get(
   "/admin/prestamo",
-  Autorizacion.autenticarToken,
+  Autenticacion.autenticarToken,
+  Autorizacion.verifyAllowedRoles(["admin"]),
   PrestamoController.getAllLoans 
 );
 

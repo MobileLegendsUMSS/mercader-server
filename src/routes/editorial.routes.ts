@@ -1,12 +1,25 @@
 import { Router } from 'express';
 import { editorialController } from '../controllers/editorial.controller';
-import * as Autorizacion from "../middlewares/autenticacion.middleware";
+import * as Autenticacion from "../middlewares/autenticacion.middleware";
 
 const router = Router();
 
-router.get('/', Autorizacion.autenticarToken, editorialController.getAllEditorials);
-router.get('/:id', Autorizacion.autenticarToken, editorialController.getEditorialById);
+router.get(
+  "/",
+  Autenticacion.autenticarToken,
+  editorialController.getAllEditorials
+);
 
-router.post('/', Autorizacion.autenticarToken, editorialController.create);
+router.get(
+  "/:id",
+  Autenticacion.autenticarToken,
+  editorialController.getEditorialById
+);
+
+router.post(
+  "/",
+  Autenticacion.autenticarToken,
+  editorialController.create
+);
 
 export default router;

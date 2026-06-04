@@ -1,12 +1,7 @@
-import mongoose, { Schema, Document } from 'mongoose';
+import mongoose, { Schema } from 'mongoose';
+import * as CategoriaTypes from "../types/categoria.types";
 
-export interface ICategoria extends Document {
-  descripcion: string;
-  createdAt?: Date;
-  updatedAt?: Date;
-}
-
-const CategoriaSchema = new Schema<ICategoria>(
+const CategoriaSchema = new Schema<CategoriaTypes.ICategoria>(
   {
     descripcion: {
       type: String,
@@ -23,4 +18,4 @@ const CategoriaSchema = new Schema<ICategoria>(
   }
 );
 
-export const Categoria = mongoose.model<ICategoria>('Categoria', CategoriaSchema);
+export const Categoria = mongoose.model<CategoriaTypes.ICategoria>('Categoria', CategoriaSchema);

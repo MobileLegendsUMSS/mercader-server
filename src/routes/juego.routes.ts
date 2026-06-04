@@ -1,21 +1,65 @@
 import { Router } from 'express';
-import { juegoController } from '../controllers/juego.controller';
 import * as GameController from "../controllers/juego.controller";
-import * as Autorizacion from "../middlewares/autenticacion.middleware";
+import * as Autenticacion from "../middlewares/autenticacion.middleware";
+import * as Autorizacion from "../middlewares/autorizacion.middleware";
 
 const router = Router();
 
-router.get('/', Autorizacion.autenticarToken, juegoController.getAllGames);
-router.get('/:id', Autorizacion.autenticarToken, GameController.getGameById);
-router.get("/sistema/recientes", Autorizacion.autenticarToken, GameController.getMostRecentGames);
-router.get("/sistema/visitados", Autorizacion.autenticarToken, GameController.getMostVisitedGames);
-router.get("/sistema/comprados", Autorizacion.autenticarToken, GameController.getMostSelledGames);
-router.get("/sistema/prestados", Autorizacion.autenticarToken, GameController.getMostBorrowedGames);
+router.get(
+  "/", 
+  Autenticacion.autenticarToken,
+  GameController.getAllGames
+);
 
-router.post('/', Autorizacion.autenticarToken, GameController.createGame);
+router.get(
+  "/:id",
+  Autenticacion.autenticarToken,
+  GameController.getGameById
+);
 
-router.delete("/", Autorizacion.autenticarToken, GameController.deleteGameById);
+router.get(
+  "/sistema/recientes",
+  Autenticacion.autenticarToken,
+  GameController.getMostRecentGames
+);
 
-router.patch("/", Autorizacion.autenticarToken, GameController.updateGameById);
+router.get(
+  "/sistema/visitados",
+  Autenticacion.autenticarToken,
+  GameController.getMostVisitedGames
+);
+
+router.get(
+  "/sistema/comprados",
+  Autenticacion.autenticarToken,
+  GameController.getMostSelledGames
+);
+
+router.get(
+  "/sistema/prestados",
+  Autenticacion.autenticarToken,
+  GameController.getMostBorrowedGames
+);
+
+router.post(
+  "/",
+  Autenticacion.autenticarToken,
+  Autorizacion.verifyAllowedRoles(["admin", "superadmin"]),
+  GameController.createGame
+);
+
+router.delete(
+  "/",
+  Autenticacion.autenticarToken,
+  Autorizacion.verifyAllowedRoles(["admin", "superadmin"]),
+  GameController.deleteGameById
+);
+
+router.patch(
+  "/",
+  Autenticacion.autenticarToken,
+  Autorizacion.verifyAllowedRoles(["admin", "superadmin"]),
+  GameController.updateGameById
+);
 
 export default router;

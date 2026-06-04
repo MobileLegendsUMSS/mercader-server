@@ -1,36 +1,41 @@
 import { Router } from "express";
-import * as Autorizacion from "../middlewares/autenticacion.middleware";
+import * as Autenticacion from "../middlewares/autenticacion.middleware";
+import * as Autorizacion from "../middlewares/autorizacion.middleware";
 import * as ReportesController from "../controllers/reporte.controller";
 
 const router = Router();
 
 router.get(
   "/usuarios/juegos-usados",
-  Autorizacion.autenticarToken,
+  Autenticacion.autenticarToken,
   ReportesController.getTop5MostUsedGamesByUser
 );
 
 router.get(
   "/admin/juegos-stock",
-  Autorizacion.autenticarToken,
+  Autenticacion.autenticarToken,
+  Autorizacion.verifyAllowedRoles(["admin", "superadmin"]),
   ReportesController.getGamesByStock
 );
 
 router.get(
   "/admin/categorias-populares",
-  Autorizacion.autenticarToken,
+  Autenticacion.autenticarToken,
+  Autorizacion.verifyAllowedRoles(["admin", "superadmin"]),
   ReportesController.getCategoryPopularity
 );
 
 router.get(
   "/superadmin/ingresos-periodo",
-  Autorizacion.autenticarToken,
+  Autenticacion.autenticarToken,
+  Autorizacion.verifyAllowedRoles(["superadmin"]),
   ReportesController.getIncomePerPeriod
 );
 
 router.get(
   "/superadmin/usos-periodo",
-  Autorizacion.autenticarToken,
+  Autenticacion.autenticarToken,
+  Autorizacion.verifyAllowedRoles(["superadmin"]),
   ReportesController.getBorrowsPerPeriod
 );
 

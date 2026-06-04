@@ -16,4 +16,5 @@ export const env = {
   DB_USER: verifyEnvVariable("DB_USER", "mongodb"),
   DB_PASSWORD: verifyEnvVariable("DB_PASSWORD", undefined),
   DB_URL: verifyEnvVariable("DB_URL", undefined),
+  JWT_SECRET: verifyEnvVariable("JWT_SECRET", undefined),
 };

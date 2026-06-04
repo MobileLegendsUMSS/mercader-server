@@ -65,19 +65,14 @@ export async function registrarUsuario(personalInfo: UserTypes.SigninPayload) {
       messageState: "No se pudo crear el usuario correctamente."
     };
   }
-  
+
   const formatedUserId = nuevoUsuario._id.toString();
   console.log(formatedUserId);
-  
-  const token = generateToken({
-    id_usuario: formatedUserId,
-    nombre: nuevoUsuario.nombre
-  });
 
   let registeredUserRol = {
     id_usuario: nuevoUsuario._id,
     id_rol: idRol
-  } 
+  }
 
   const rolUsuario = await UsuarioRol.create(registeredUserRol);
 
@@ -88,6 +83,12 @@ export async function registrarUsuario(personalInfo: UserTypes.SigninPayload) {
       messageState: "No se pudo asignar el rol al usuario correctamente."
     };
   }
+
+  const token = generateToken({
+    id_usuario: formatedUserId,
+    nombre: nuevoUsuario.nombre,
+    rol: rol 
+  });
 
   return {
     result: true,

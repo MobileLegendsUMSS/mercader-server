@@ -1,82 +1,231 @@
-import { Juego } from '../models/juego.model';
-import { JuegoCategoria, IJuegoCategoria } from '../models/juegoCategoria.model';
 import { Types } from 'mongoose';
-import * as ServiceTypes from "../types/servicio.types";
-import * as ServiceService from "../services/servicio.service";
-import * as JuegoTypes from "../types/juego.types"
-import * as ReporteTypes from "../types/reporte.types";
+import { JuegoCategoria } from '../models/juegoCategoria.model';
+import { Juego } from '../models/juego.model';
 import { Categoria } from '../models/categoria.model';
 import { Dificultad } from '../models/dificultad.model';
 import { Editorial } from '../models/editorial.model';
 import { UsuarioJuego } from "../models/usuariojuego.model"
 import { Usuario } from "../models/usuario.model";
+import { ServicioJuego } from '../models/servicioJuego.model';
+import { Servicio } from '../models/servicio.model';
+import * as ServiceTypes from "../types/servicio.types";
+import * as ServiceService from "../services/servicio.service";
+import * as JuegoTypes from "../types/juego.types"
+import * as ReporteTypes from "../types/reporte.types";
 
-export class JuegoService {
-  async getAllGames(): Promise<JuegoTypes.IJuego[]> {
-    return await Juego.find()
+export async function getAllGames() {
+  try {
+    const foundGames = await Juego.find()
       .populate('id_dificultad')
       .populate('id_editorial')
+      .lean()
       .exec();
+    if (!foundGames || foundGames.length === 0) {
+      return {
+        result: true,
+        statusCode: 200,
+        messageState: "No existen juegos registrados aun."
+      };
+    }
+
+    const gameIds = foundGames.map(game => game._id);
+
+    const foundGameCategories = await JuegoCategoria.find({
+      id_juego: { $in: gameIds }
+    }).lean();
+    const foundGameServices = await ServicioJuego.find({
+      id_juego: { $in: gameIds }
+    }).lean();
+
+    const categoryIds = [...new Set(foundGameCategories.map(cat => cat.id_categoria))];
+    const categories = await Categoria.find({
+      _id: { $in: categoryIds }
+    }, "descripcion").lean();
+    const serviceIds = [...new Set(foundGameServices.map(serv => serv.id_servicio))];
+    const services = await Servicio.find({
+      _id: { $in: serviceIds }
+    }, "nombre").lean();
+
+    const categoryMap = new Map(categories.map(cat => [cat._id.toString(), cat.descripcion]));
+    const serviceMap = new Map(services.map(serv => [serv._id.toString(), serv.nombre]));
+
+    const categoriesByGame = new Map();
+    for (const gameCategory of foundGameCategories) {
+      const gameId = gameCategory.id_juego.toString();
+      const categoryId = gameCategory.id_categoria.toString();
+      if (!categoriesByGame.has(gameId)) {
+        categoriesByGame.set(gameId, []);
+      }
+      const category = categoryMap.get(categoryId);
+      if (category) {
+        categoriesByGame.get(gameId).push(category);
+      }
+    }
+
+    const servicesByGame = new Map();
+    for (const gameService of foundGameServices) {
+      const gameId = gameService.id_juego.toString();
+      const serviceId = gameService.id_servicio.toString();
+      if (!servicesByGame.has(gameId)) {
+        servicesByGame.set(gameId, []);
+      }
+      const service = serviceMap.get(serviceId);
+      if (service) {
+        servicesByGame.get(gameId).push(service);
+      }
+    }
+
+    const gameData = [];
+    for (const game of foundGames) {
+      const formatedIdGame = game._id.toString();
+      const gameCatecories = categoriesByGame.get(formatedIdGame) || [];
+      const gameServices = servicesByGame.get(formatedIdGame) || [];
+      if (gameCatecories.length === 0) {
+        return {
+          result: false,
+          statusCode: 400,
+          messageState: `El juego ${game.titulo} no tiene categorias asignadas.`
+        };
+      }
+      if (gameServices.length === 0) {
+        return {
+          result: false,
+          statusCode: 400,
+          messageState: `El juego ${game.titulo} no tiene servicios asignados.`
+        }
+      }
+      gameData.push({
+        ...game,
+        categorias: gameCatecories,
+        servicios: gameServices
+      });
+    }
+
+    if (!gameData || gameData.length === 0) {
+      return {
+        result: true,
+        statusCode: 200,
+        messageState: "No hay juegos registrados aun."  
+      };
+    }
+    return {
+      result: true,
+      statusCode: 200,
+      messageState: "Todos los juegos registrados se han obtenido correctamente.",
+      data: gameData
+    };
+  } catch (err) {
+    return {
+      result: false,
+      statusCode: 500,
+      messageState: `Error interno del servidor: ${(err as Error).message}`
+    };
   }
 }
 
 export async function getGameById(idUser: string, id: string) {
-  const formatedIdUser = new Types.ObjectId(idUser);
-  const foundUser = await Usuario.findById(formatedIdUser);
-  if (!foundUser) {
-    return {
-      result: false,
-      statusCode: 404,
-      messageState: "Usuario no encontrado."
-    };
-  }
-
-  if (!Types.ObjectId.isValid(id)) {
-    return {
-      result: false,
-      statusCode: 400,
-      messageState: "Id de juego inválido."
-    };
-  }
-  const foundGame = await Juego.findById(id)
-    .populate('id_dificultad')
-    .populate('id_editorial')
-    .exec();
-  if (!foundGame) {
-    return {
-      result: false,
-      statusCode: 404,
-      messageState: "Juego no encontrado."
-    };
-  }
-
-  const formatedIdGame = new Types.ObjectId(id);
-  const foundUserGame = await UsuarioJuego.findOne({
-    id_usuario: formatedIdUser,
-    id_juego: formatedIdGame
-  });
-
-  const updatedGame = await Juego.findOneAndUpdate(
-    { _id: formatedIdGame },
-    { $set: { visitas: foundGame.visitas + 1 } },
-    { new: true }
-  );
-  if (!updatedGame) {
-    return {
-      result: false,
-      statusCode: 400,
-      messageState: "No se pudo actualizar el numero de visitas del juego."
+  try {
+    const formatedIdUser = new Types.ObjectId(idUser);
+    const foundUser = await Usuario.findById(formatedIdUser);
+    if (!foundUser) {
+      return {
+        result: false,
+        statusCode: 404,
+        messageState: "Usuario no encontrado."
+      };
     }
+
+    if (!Types.ObjectId.isValid(id)) {
+      return {
+        result: false,
+        statusCode: 400,
+        messageState: "Id de juego inválido."
+      };
+    }
+    const foundGame = await Juego.findById(id)
+      .populate('id_dificultad')
+      .populate('id_editorial')
+      .exec();
+    if (!foundGame) {
+      return {
+        result: false,
+        statusCode: 404,
+        messageState: "Juego no encontrado."
+      };
+    }
+    const formatedIdGame = new Types.ObjectId(id);
+
+    const foundGameCategories = await JuegoCategoria.find({
+      id_juego: formatedIdGame
+    }, "id_categoria");
+    if (!foundGameCategories || foundGameCategories.length === 0) {
+      return {
+        result: false,
+        statusCode: 404,
+        messageState: "El juego no tiene categorias asignadas."
+      }
+    }
+    const categoryIds = foundGameCategories.map(cat => cat.id_categoria);
+    const rawCategories = await Categoria.find({
+      _id: { $in: categoryIds }
+    }, "descripcion");
+    const categories = rawCategories.map(rawCat => rawCat.descripcion);
+
+    const foundGameServices = await ServicioJuego.find({
+      id_juego: formatedIdGame
+    }, "id_servicio");
+    if (!foundGameServices || foundGameServices.length === 0) {
+      return {
+        result: false,
+        statusCode: 404,
+        messageState: "El juego no tiene categorias asignadas."
+      }
+    }
+    const serviceIds = foundGameServices.map(serv => serv.id_servicio);
+    const rawServices = await Servicio.find({
+      _id: { $in: serviceIds }
+    }, "nombre");
+    const services = rawServices.map(rawServ => rawServ.nombre);
+
+    const foundUserGame = await UsuarioJuego.findOne({
+      id_usuario: formatedIdUser,
+      id_juego: formatedIdGame
+    });
+
+    const updatedGame = await Juego.findOneAndUpdate(
+      { _id: formatedIdGame },
+      { $set: { visitas: foundGame.visitas + 1 } },
+      { new: true }
+    );
+    if (!updatedGame) {
+      return {
+        result: false,
+        statusCode: 400,
+        messageState: "No se pudo actualizar el numero de visitas del juego."
+      }
+    }
+    const flag = (foundUserGame) ? true : false;
+    const gameData = updatedGame.toObject() as typeof foundGame & {
+      categorias: string[],
+      servicios: string[],
+      isFavorite: boolean
+    };
+    gameData.categorias = categories;
+    gameData.servicios = services;
+    gameData.isFavorite = flag;
+    return {
+      result: true,
+      statusCode: 200,
+      messageState: "Juego encontrado exitosamente.",
+      data: gameData
+    };
+  } catch (err) {
+    return {
+      result: false,
+      statusCode: 500,
+      messageState: `Error interno del servidor: ${(err as Error).message}`
+    };
   }
-  const flag = (foundUserGame) ? true : false;
-  const gameData = updatedGame.toObject() as typeof foundGame & { isFavorite: boolean };
-  gameData.isFavorite = flag;
-  return {
-    result: true,
-    statusCode: 200,
-    messageState: "Juego encontrado exitosamente.",
-    data: gameData
-  };
 }
 
 export async function deleteGameById(id: string, justificacionRetiro: string) {
@@ -105,7 +254,7 @@ export async function deleteGameById(id: string, justificacionRetiro: string) {
       result: false,
       statusCode: 500,
       messageState: `Error interno del servidor: ${(err as Error).message}`
-    }
+    };
   }
 }
 
@@ -304,7 +453,7 @@ export async function handleMostGames(
   amount?: number) {
   try {
     let magicWord;
-    let sortCondition;    
+    let sortCondition;
     let atribute;
     if (action === "visited") {
       sortCondition = (order === ReporteTypes.Ordenamiento.ASCENDENTE)
@@ -327,7 +476,7 @@ export async function handleMostGames(
     }
 
     const foundGames = await Juego.find({
-      }, `_id titulo descripcion durecion_min duracion_max precio disponible activo ${atribute}`)
+    }, `_id titulo descripcion durecion_min duracion_max precio disponible activo ${atribute}`)
       .sort(sortCondition);
     if (!foundGames || foundGames.length === 0) {
       return {
@@ -351,8 +500,8 @@ export async function handleMostGames(
       formatedGames = foundGames;
     }
     const message = (amount)
-      ?  `Los primeros ${amount} juegos mas ${magicWord} se han obtenido correctamente.`
-      :  `Juegos mas ${magicWord} obtenidos correctamente.`
+      ? `Los primeros ${amount} juegos mas ${magicWord} se han obtenido correctamente.`
+      : `Juegos mas ${magicWord} obtenidos correctamente.`
     return {
       result: true,
       statusCode: 200,
