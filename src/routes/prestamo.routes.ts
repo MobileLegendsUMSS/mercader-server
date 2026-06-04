@@ -34,7 +34,7 @@ router.post(
   "/admin/prestamo",
   Autenticacion.autenticarToken,
   Autorizacion.verifyAllowedRoles(["admin"]),
-  PrestamoController.getAllLoans 
+  PrestamoController.getAllLoans
 );
 
 export default router;
