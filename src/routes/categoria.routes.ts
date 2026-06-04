@@ -1,13 +1,31 @@
 import { Router } from 'express';
 import { categoriaController } from '../controllers/categoria.controller';
-import * as Autorizacion from "../middlewares/autenticacion.middleware";
+import * as Autenticacion from "../middlewares/autenticacion.middleware";
 
 const router = Router();
 
-router.get('/', Autorizacion.autenticarToken, categoriaController.getAllCategories);
-router.get('/:id', Autorizacion.autenticarToken, categoriaController.getCategoryById);
-router.get('/:id/juegos', Autorizacion.autenticarToken, categoriaController.getGamesByCategory);
+router.get(
+  "/",
+  Autenticacion.autenticarToken,
+  categoriaController.getAllCategories
+);
 
-router.post('/', Autorizacion.autenticarToken, categoriaController.create);
+router.get(
+  "/:id",
+  Autenticacion.autenticarToken,
+  categoriaController.getCategoryById
+);
+
+router.get(
+  "/:id/juegos",
+  Autenticacion.autenticarToken,
+  categoriaController.getGamesByCategory
+);
+
+router.post(
+  "/",
+  Autenticacion.autenticarToken,
+  categoriaController.create
+);
 
 export default router;

@@ -1,29 +1,31 @@
 import { Request, Response } from 'express';
-import { JuegoService } from '../services/juego.service';
 import * as ServiceTypes from "../types/servicio.types";
 import * as TokenTypes from "../types/token.types";
 import * as GameTypes from "../types/juego.types";
 import * as ReporteTypes from "../types/reporte.types";
 import * as GameService from "../services/juego.service";
 
-const juegoService = new JuegoService();
-
-interface ParamsDictionary {
-  id: string;
-}
-
-export const juegoController = {
-
-  async getAllGames(req: Request, res: Response) {
-    try {
-      const juegos = await juegoService.getAllGames();
-      res.json({ success: true, data: juegos });
-    } catch (error: any) {
-      res.status(500).json({ success: false, error: error.message });
+export async function getAllGames(req: Request, res: Response) {
+  try {
+    const { result, statusCode, messageState, data } = await GameService.getAllGames();
+    if (!data) {
+      return res.status(statusCode).json({
+        success: result,
+        message: messageState
+      });
     }
-  },
-
-};
+    return res.status(200).json({
+      success: true,
+      message: "Todos los juegos registrados se han obtenido correctamente.",
+      data: data
+    });
+  } catch (err) {
+    return res.status(500).json({
+      result: false,
+      message: `Error interno del servidor: ${(err as Error).message}`
+    });
+  }
+}
 
 export async function getGameById(req: Request, res: Response) {
   try {
@@ -52,8 +54,11 @@ export async function getGameById(req: Request, res: Response) {
       success: true,
       data: data
     });
-  } catch (error: any) {
-    res.status(500).json({ success: false, error: error.message });
+  } catch (err) {
+    return res.status(500).json({
+      result: false,
+      message: `Error interno del servidor: ${(err as Error).message}`
+    });
   }
 }
 

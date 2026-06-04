@@ -30,7 +30,7 @@ export const autenticarToken = (
 
     // Verificar y decodificar el token
     const decodificado = jwt.verify(token, JWT_SECRET) as any;
-    
+
     // Guardar los datos del usuario en la request
     req.user = {
       id_usuario: decodificado.id_usuario,
@@ -40,7 +40,7 @@ export const autenticarToken = (
     next();
   } catch (error: any) {
     console.error('Error al verificar token:', error);
-    
+
     if (error.name === 'TokenExpiredError') {
       res.status(401).json({
         error: 'Token expirado'

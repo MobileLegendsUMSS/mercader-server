@@ -149,15 +149,17 @@ export async function getCategiryPopularity() {
       };
     }
 
-    const gameIds = foundLoanGames.map(loanGame => loanGame.id_juego);
+    const uniqueGames = [...new Set(foundLoanGames.map(loanGame => loanGame.id_juego.toString()))];
+
     const foundCategories = await JuegoCategoria.find({
-      id_juego: { $in: gameIds }
+      id_juego: { $in: uniqueGames }
     }, "id_categoria");
 
     const categoryFrequency = new Map();
     foundCategories.forEach(catFreq => {
-      const count = categoryFrequency.get(catFreq.id_categoria) || 0;
-      categoryFrequency.set(catFreq.id_categoria, count + 1)
+      const idCategory = catFreq.id_categoria.toString();
+      const count = categoryFrequency.get(idCategory) || 0;
+      categoryFrequency.set(idCategory, count + 1)
     });
     const categoryLength = categoryFrequency.size;
     if (!categoryFrequency || categoryLength === 0) {
@@ -168,13 +170,14 @@ export async function getCategiryPopularity() {
       };
     }
 
+    const totalUniqueGames = uniqueGames.length;
     const categories = [];
     for (let [idCategory, count] of categoryFrequency.entries()) {
       const currentCategory = await Categoria.findOne({
         _id: idCategory
       }, "descripcion");
       if (currentCategory) {
-        const categoryInfo = { descripcion: currentCategory.descripcion, frecuencia: (count / categoryLength) * 100 };
+        const categoryInfo = { descripcion: currentCategory.descripcion, frecuencia: (count / totalUniqueGames) * 100 };
         categories.push(categoryInfo);
       }
     }
@@ -305,5 +308,5 @@ export async function getIncomePerPeriod(timePeriod: string, timeValue: string) 
 }
 
 export async function getBorrowsPerPeriod(timePeriod: string, timeValue: string) {
-  return await handlePerPeriod(timePeriod, timeValue, "borrows"); 
+  return await handlePerPeriod(timePeriod, timeValue, "borrows");
 }

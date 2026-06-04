@@ -36,11 +36,6 @@ export async function autenticarUsuario(datos: UserTypes.LoginPayload) {
   const formatedUserId = usuario._id.toString();
   console.log(formatedUserId);
 
-  const token = generateToken({
-    id_usuario: formatedUserId,
-    nombre: usuario.nombre
-  });
-
   const idRol = await UsuarioRol.findOne({ id_usuario: usuario._id });
   if (!idRol) {
     return {
@@ -57,28 +52,35 @@ export async function autenticarUsuario(datos: UserTypes.LoginPayload) {
       messageState: "Rol no encontrado"
     };
   }
+
   // por alguna razon lo marca en rojo el getRol, pero esta bien es del ts el error, no es un error real
   let rolName = getRol.nombre_rol;
+  const token = generateToken({
+    id_usuario: formatedUserId,
+    nombre: usuario.nombre,
+    rol: rolName
+  });
+
   return {
     mensaje: 'Autenticación exitosa',
     token,
     usuario: {
       id: usuario._id.toString(),
-      nombre: usuario.nombre
+      nombre: usuario.nombre,
     },
     rol: rolName
   };
 };
 
 export class UsuarioService {
-  async getUsuario(){
+  async getUsuario() {
     return await Usuario.find()
       .populate('id_dificultad')
       .populate('id_editorial')
       .exec();
   }
 
-  async getUsuarioById(id: string){
+  async getUsuarioById(id: string) {
     if (!Types.ObjectId.isValid(id)) return null;
     return await Usuario.findById(id)
       .populate('id_dificultad')
