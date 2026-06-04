@@ -23,6 +23,11 @@ const loanSchema = new Schema<PrestamoTypes.IPrestamo>(
     },
     fecha_fin: {
       type: Date
+    },
+    multado: {
+      type: Boolean,
+      required: [true, "Estado de multa requerido"],
+      default: false
     }
   },
   {
