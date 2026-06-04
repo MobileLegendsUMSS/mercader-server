@@ -12,6 +12,7 @@ import * as ServiceTypes from "../types/servicio.types";
 import * as ServiceService from "../services/servicio.service";
 import * as JuegoTypes from "../types/juego.types"
 import * as ReporteTypes from "../types/reporte.types";
+import * as ImagenService from "../services/imagen.service";
 
 export async function getAllGames() {
   try {
@@ -105,7 +106,7 @@ export async function getAllGames() {
       return {
         result: true,
         statusCode: 200,
-        messageState: "No hay juegos registrados aun."  
+        messageState: "No hay juegos registrados aun."
       };
     }
     return {
@@ -258,7 +259,11 @@ export async function deleteGameById(id: string, justificacionRetiro: string) {
   }
 }
 
-export async function createGame(idCategory: string, gameInfo: Partial<JuegoTypes.IJuego>, services: string[]) {
+export async function createGame(
+  idCategory: string,
+  gameInfo: JuegoTypes.IJuego,
+  services: string[],
+  coverImage: Express.Multer.File) {
   try {
     const foundGame = await Juego.findOne({ titulo: gameInfo.titulo });
     if (foundGame) {
@@ -269,7 +274,11 @@ export async function createGame(idCategory: string, gameInfo: Partial<JuegoType
       };
     }
 
-    const createdGame = await Juego.create(gameInfo);
+    const coverImageURL = await ImagenService.uploadGameCoverImage(
+      gameInfo.titulo, coverImage.buffer, coverImage.mimetype);
+
+    const completeGameInfo = Object.assign(gameInfo, { portada: coverImageURL })
+    const createdGame = await Juego.create(completeGameInfo);
     if (!createdGame) {
       return {
         result: false,
@@ -313,7 +322,11 @@ export async function createGame(idCategory: string, gameInfo: Partial<JuegoType
   }
 }
 
-export async function updateGameById(idGame: string, fieldName: string, fieldValue: string | number) {
+export async function updateGameById(
+  idGame: string,
+  fieldName: string,
+  fieldValue: string | number,
+  coverImage?: Express.Multer.File) {
   try {
     const formatedIdGame = new Types.ObjectId(idGame);
     const foundGame = await Juego.findOne({ _id: formatedIdGame });
@@ -323,6 +336,15 @@ export async function updateGameById(idGame: string, fieldName: string, fieldVal
         statusCode: 400,
         messageState: "Juego no encontrado"
       };
+    }
+
+    if (coverImage) {
+      const updatedCoverImageURL = await ImagenService.updateGameCoverImage(
+        foundGame.titulo, coverImage.buffer, coverImage.mimetype);
+      await Juego.findOneAndUpdate(
+        { _id: formatedIdGame },
+        { $set: { portada: updatedCoverImageURL } }
+      );
     }
 
     if (fieldName === "categoria") {
@@ -388,7 +410,7 @@ export async function updateGameById(idGame: string, fieldName: string, fieldVal
           messageState: "El juego no se pudo actualizar correctamente."
         };
       }
-    } else {
+    }  else {
       const updatedGame = await Juego.findOneAndUpdate(
         { _id: idGame },
         { $set: { [fieldName]: fieldValue } },
@@ -423,7 +445,7 @@ export async function getMostRecentGames() {
 
     const foundGames = await Juego.find({
       createdAt: { $gte: recentLimit }
-    }, "_id titulo descripcion durecion_min duracion_max precio disponible activo");
+    }, "_id titulo descripcion durecion_min duracion_max precio disponible activo portada");
     if (!foundGames || foundGames.length === 0) {
       return {
         result: true,

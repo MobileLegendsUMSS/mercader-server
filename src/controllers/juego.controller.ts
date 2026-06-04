@@ -99,6 +99,7 @@ export async function createGame(req: Request, res: Response) {
   try {
     const { idCategory } = req.query;
     const { services, ...gameInfo } = req.body;
+    const portada = req.file as Express.Multer.File;
 
     if (!idCategory || typeof idCategory !== "string") {
       return res.status(400).json({
@@ -120,9 +121,15 @@ export async function createGame(req: Request, res: Response) {
         message: "Informacion del juego invalida o incompleta."
       });
     }
+    if (!portada || (portada && !portada.mimetype.startsWith("image/"))) {
+      return res.status(400).json({
+        success: false,
+        message: "Imagen de portada del juego invalida."
+      });
+    }
 
     const formatedServices = services as string[]
-    const { result, statusCode, messageState, data } = await GameService.createGame(idCategory, gameInfo, formatedServices);
+    const { result, statusCode, messageState, data } = await GameService.createGame(idCategory, gameInfo, formatedServices, portada);
     if (!result) {
       return res.status(statusCode).json({
         success: false,
@@ -146,6 +153,7 @@ export async function updateGameById(req: Request, res: Response) {
   try {
     const { id_juego } = req.query;
     const { fieldName, fieldValue } = req.body;
+    const portada = req.file as Express.Multer.File;
 
     if ((!id_juego || typeof id_juego !== "string") ||
       (!fieldName || typeof fieldName !== "string")) {
@@ -173,8 +181,14 @@ export async function updateGameById(req: Request, res: Response) {
         message: "El campo requiere un valor numerico."
       });
     }
+    if (portada && !portada.mimetype.startsWith("image/")) {
+      return res.status(400).json({
+        success: false,
+        message: "Imagen de portada del juego invalida."
+      });
+    }
 
-    const { result, statusCode, messageState } = await GameService.updateGameById(id_juego, fieldName, fieldValue);
+    const { result, statusCode, messageState } = await GameService.updateGameById(id_juego, fieldName, fieldValue, portada);
     if (!result) {
       return res.status(statusCode).json({
         success: false,

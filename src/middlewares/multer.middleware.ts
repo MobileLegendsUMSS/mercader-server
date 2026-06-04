@@ -26,3 +26,12 @@ export function checkPaymentProofImageErrors(req: Request, res: Response, next: 
     next();
   });
 }
+
+export function checkGameImageErrors(req: Request, res: Response, next: NextFunction) {
+  upload.single("portada")(req, res, (err) => {
+    if (err) {
+      return verifyMulter(err, req, res, next);
+    }
+    next();
+  });
+}

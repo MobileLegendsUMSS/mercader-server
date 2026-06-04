@@ -27,10 +27,10 @@ router.patch(
 router.delete(
   "/usuarios/prestamo",
   Autenticacion.autenticarToken,
-  PrestamoController.deleteUserLoan
+  PrestamoController.deleteUserLoan 
 );
 
-router.get(
+router.post(
   "/admin/prestamo",
   Autenticacion.autenticarToken,
   Autorizacion.verifyAllowedRoles(["admin"]),
