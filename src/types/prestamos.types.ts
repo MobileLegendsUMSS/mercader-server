@@ -6,7 +6,8 @@ export interface IPrestamo {
   fecha_solicitud: Date;
   fecha_limite: Date;
   fecha_inicio: Date;
-  fecha_fin: Date
+  fecha_fin: Date;
+  multado: Boolean;
 }
 
 export interface IPrestamoJuego {

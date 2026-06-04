@@ -138,16 +138,9 @@ export async function getUserLoans(req: Request, res: Response) {
 
 export async function updateUserLoan(req: Request, res: Response) {
   try {
-    const { id_usuario } = req.user as TokenTypes.TokenPayload;
     const { id_prestamo } = req.query;
     const { fecha_inicio, fecha_fin } = req.body;
 
-    if (!id_usuario || typeof id_usuario !== "string") {
-      return res.status(400).json({
-        success: false,
-        message: "Id de usuario invalido."
-      });
-    }
     if (!id_prestamo || typeof id_prestamo !== "string") {
       return res.status(400).json({
         success: false,
@@ -186,9 +179,9 @@ export async function updateUserLoan(req: Request, res: Response) {
           message: "La fecha de fin de prestamo no puede ser futura."
         });
       }
-      ans = await PrestamoService.updateUserLoan(id_prestamo, id_usuario, startDate, endDate);
+      ans = await PrestamoService.updateUserLoan(id_prestamo, startDate, endDate);
     } else {
-      ans = await PrestamoService.updateUserLoan(id_prestamo, id_usuario, startDate);
+      ans = await PrestamoService.updateUserLoan(id_prestamo, startDate);
     }
 
     const { result, statusCode, messageState } = ans;
@@ -212,15 +205,8 @@ export async function updateUserLoan(req: Request, res: Response) {
 
 export async function deleteUserLoan(req: Request, res: Response) {
   try {
-    const { id_usuario } = req.user as TokenTypes.TokenPayload;
     const { id_prestamo } = req.query;
 
-    if (!id_usuario || typeof id_usuario !== "string") {
-      return res.status(400).json({
-        success: false,
-        message: "Id de usuario invalido."
-      });
-    }
     if (!id_prestamo || typeof id_prestamo !== "string") {
       return res.status(400).json({
         success: false,
@@ -228,7 +214,7 @@ export async function deleteUserLoan(req: Request, res: Response) {
       });
     }
 
-    const { result, statusCode, messageState } = await PrestamoService.deleteUserLoan(id_prestamo, id_usuario);
+    const { result, statusCode, messageState } = await PrestamoService.deleteUserLoan(id_prestamo);
     if (!result) {
       return res.status(statusCode).json({
         success: false,
