@@ -1,15 +1,16 @@
-import { Categoria, ICategoria } from '../models/categoria.model';
+import { Categoria } from '../models/categoria.model';
 import { JuegoCategoria } from '../models/juegoCategoria.model';
 import { Types } from 'mongoose';
+import * as CategoriaTypes from "../types/categoria.types";
 
 export class CategoriaService {
   
-  async createCategory(data: Partial<ICategoria>): Promise<ICategoria> {
+  async createCategory(data: Partial<CategoriaTypes.ICategoria>): Promise<CategoriaTypes.ICategoria> {
     const categoria = await Categoria.create(data);
     return categoria;
   }
 
-  async getCategoryById(id: string): Promise<ICategoria | null> {
+  async getCategoryById(id: string): Promise<CategoriaTypes.ICategoria | null> {
     if (!Types.ObjectId.isValid(id)) return null;
     return await Categoria.findById(id).exec();
   }
