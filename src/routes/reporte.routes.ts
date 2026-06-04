@@ -11,7 +11,7 @@ router.get(
   ReportesController.getTop5MostUsedGamesByUser
 );
 
-router.get(
+router.post(
   "/admin/juegos-stock",
   Autenticacion.autenticarToken,
   Autorizacion.verifyAllowedRoles(["admin", "superadmin"]),
@@ -25,14 +25,14 @@ router.get(
   ReportesController.getCategoryPopularity
 );
 
-router.get(
+router.post(
   "/superadmin/ingresos-periodo",
   Autenticacion.autenticarToken,
   Autorizacion.verifyAllowedRoles(["superadmin"]),
   ReportesController.getIncomePerPeriod
 );
 
-router.get(
+router.post(
   "/superadmin/usos-periodo",
   Autenticacion.autenticarToken,
   Autorizacion.verifyAllowedRoles(["superadmin"]),
