@@ -4,6 +4,8 @@ import * as ServiceTypes from "../types/servicio.types";
 import * as TokenTypes from "../types/token.types";
 import * as GameTypes from "../types/juego.types";
 import * as GameService from "../services/juego.service";
+import { ServicioJuego } from '../models/servicioJuego.model';
+import { Types } from 'mongoose';
 
 const juegoService = new JuegoService();
 
@@ -186,3 +188,44 @@ export async function updateGameById(req: Request, res: Response) {
     });
   }
 }
+
+export const getGameServices = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { id_juego } = req.query;
+
+    if (!id_juego || typeof id_juego !== 'string') {
+      res.status(400).json({
+        success: false,
+        message: 'ID de juego no proporcionado o inválido'
+      });
+      return;
+    }
+
+    if (!Types.ObjectId.isValid(id_juego)) {
+      res.status(400).json({
+        success: false,
+        message: 'ID de juego inválido'
+      });
+      return;
+    }
+
+    const servicios = await ServicioJuego.find({ 
+      id_juego: new Types.ObjectId(id_juego) 
+    }).populate('id_servicio');
+
+    const servicesList: string[] = servicios
+      .map((servicio: any) => servicio.id_servicio?.nombre)
+      .filter(Boolean);
+
+    res.status(200).json({
+      success: true,
+      services: servicesList
+    });
+  } catch (error) {
+    console.error('Error en getGameServices:', error);
+    res.status(500).json({
+      success: false,
+      message: error instanceof Error ? error.message : 'Error interno del servidor'
+    });
+  }
+};

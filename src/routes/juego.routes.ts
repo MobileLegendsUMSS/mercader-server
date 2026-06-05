@@ -6,7 +6,10 @@ import * as Autorizacion from "../middlewares/autenticacion.middleware";
 const router = Router();
 
 router.get('/', Autorizacion.autenticarToken, juegoController.getAllGames);
+
 router.get('/:id', Autorizacion.autenticarToken, GameController.getGameById);
+
+router.get('/servicios', Autorizacion.autenticarToken, GameController.getGameServices);
 
 router.post('/', Autorizacion.autenticarToken, GameController.createGame);
 
