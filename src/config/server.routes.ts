@@ -10,6 +10,7 @@ import AuthRoutes from "../routes/auth.routes";
 import UsuarioRoutes from "../routes/usuario.routes";
 import ResenaRoutes from "../routes/resena.routes";
 import ReporteRoutes from "../routes/reporte.routes";
+import AdminRoutes from "../routes/admin.routes";
 
 const router = Router();
 
@@ -27,6 +28,7 @@ router.use("/api/servicios", PrestamoRoutes);
 router.use("/api/perfil", UsuarioRoutes);
 router.use("/api/resenas", ResenaRoutes);
 router.use("/api/reportes", ReporteRoutes);
+router.use('/api/admin', AdminRoutes);
 
 router.get("/health", (req: Request, res: Response) => {
   res.status(200).json({

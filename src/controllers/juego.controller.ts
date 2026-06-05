@@ -4,6 +4,8 @@ import * as TokenTypes from "../types/token.types";
 import * as GameTypes from "../types/juego.types";
 import * as ReporteTypes from "../types/reporte.types";
 import * as GameService from "../services/juego.service";
+import { ServicioJuego } from '../models/servicioJuego.model';
+import { Types } from 'mongoose';
 
 export async function getAllGames(req: Request, res: Response) {
   try {
@@ -310,3 +312,43 @@ export async function getMostSelledGames(req: Request, res: Response) {
 export async function getMostBorrowedGames(req: Request, res: Response) {
   return await handleMostGames(req, res, "borrowed");
 }
+export const getGameServices = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { id_juego } = req.query;
+
+    if (!id_juego || typeof id_juego !== 'string') {
+      res.status(400).json({
+        success: false,
+        message: 'ID de juego no proporcionado o inválido'
+      });
+      return;
+    }
+
+    if (!Types.ObjectId.isValid(id_juego)) {
+      res.status(400).json({
+        success: false,
+        message: 'ID de juego inválido'
+      });
+      return;
+    }
+
+    const servicios = await ServicioJuego.find({ 
+      id_juego: new Types.ObjectId(id_juego) 
+    }).populate('id_servicio');
+
+    const servicesList: string[] = servicios
+      .map((servicio: any) => servicio.id_servicio?.nombre)
+      .filter(Boolean);
+
+    res.status(200).json({
+      success: true,
+      services: servicesList
+    });
+  } catch (error) {
+    console.error('Error en getGameServices:', error);
+    res.status(500).json({
+      success: false,
+      message: error instanceof Error ? error.message : 'Error interno del servidor'
+    });
+  }
+};

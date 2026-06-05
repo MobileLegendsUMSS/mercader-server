@@ -19,6 +19,14 @@ router.get(
 );
 
 router.get(
+  "/servicios",
+  Autenticacion.autenticarToken,
+  Autorizacion.verifyAllowedRoles(["admin", "superadmin"]),
+  MulterCheck.checkGameImageErrors,
+  GameController.getGameServices
+);
+
+router.get(
   "/sistema/recientes",
   Autenticacion.autenticarToken,
   GameController.getMostRecentGames

@@ -1,29 +1,22 @@
 import { Types } from 'mongoose';
-import { generateToken } from '../utils/jwt.helper';
+import { generateAccessToken, generateRefreshToken } from '../utils/jwt.helper';
 import { Usuario } from '../models/usuario.model';
 import * as UserTypes from '../types/usuario.types';
 import bcrypt from 'bcryptjs';
 import { UsuarioRol } from '../models/usuarioRol.model';
 import { Rol } from '../models/rol.model';
-
-const JWT_SECRET = process.env.JWT_SECRET;
-if (!JWT_SECRET) {
-  throw new Error('La variable de entorno JWT_SECRET no está definida. Agrega JWT_SECRET en tu .env.');
-}
+import { RefreshToken } from '../models/refreshToken.model';
 
 export async function autenticarUsuario(datos: UserTypes.LoginPayload) {
-  // Validar que los datos no estén vacíos
   if (!datos.nombre || !datos.contrasenna) {
     throw new Error('El nombre y la contraseña son requeridos');
   }
 
-  // Buscar el usuario por nombre
   const usuario = await Usuario.findOne({ nombre: datos.nombre });
   if (!usuario) {
     throw new Error('Usuario o contraseña incorrectos');
   }
 
-  // Comparar la contrasenna proporcionada con la encriptada en la BD
   const contrasennaValida = await bcrypt.compare(
     datos.contrasenna,
     usuario.contrasenna
@@ -34,57 +27,45 @@ export async function autenticarUsuario(datos: UserTypes.LoginPayload) {
   }
 
   const formatedUserId = usuario._id.toString();
-  console.log(formatedUserId);
 
-  const idRol = await UsuarioRol.findOne({ id_usuario: usuario._id });
-  if (!idRol) {
-    return {
-      result: false,
-      statusCode: 400,
-      messageState: "No se encontro el rol del Usuario."
-    };
-  }
-  const getRol = await Rol.findOne({ _id: idRol.id_rol });
-  if (!getRol) {
-    return {
-      result: false,
-      statusCode: 404,
-      messageState: "Rol no encontrado"
-    };
+  // Obtener el rol del usuario
+  const usuarioRol = await UsuarioRol.findOne({ id_usuario: usuario._id });
+  if (!usuarioRol) {
+    throw new Error('No se encontró el rol del usuario');
   }
 
-  // por alguna razon lo marca en rojo el getRol, pero esta bien es del ts el error, no es un error real
-  let rolName = getRol.nombre_rol;
-  const token = generateToken({
+  const rolDoc = await Rol.findOne({ _id: usuarioRol.id_rol });
+  if (!rolDoc) {
+    throw new Error('No se encontró el rol del usuario');
+  }
+
+  const rolNombre = rolDoc.nombre_rol;
+
+  const accessToken = generateAccessToken({
     id_usuario: formatedUserId,
     nombre: usuario.nombre,
-    rol: rolName
+    rol: rolNombre
+  });
+
+  const refreshToken = generateRefreshToken({
+    id_usuario: formatedUserId
+  });
+
+  await RefreshToken.create({
+    token: refreshToken,
+    id_usuario: usuario._id,
+    expiresAt: new Date(Date.now() + 15 * 60 * 1000),
+    revoked: false
   });
 
   return {
     mensaje: 'Autenticación exitosa',
-    token,
+    accessToken,
+    refreshToken,
     usuario: {
       id: usuario._id.toString(),
       nombre: usuario.nombre,
     },
-    rol: rolName
+    rol: rolNombre
   };
-};
-
-export class UsuarioService {
-  async getUsuario() {
-    return await Usuario.find()
-      .populate('id_dificultad')
-      .populate('id_editorial')
-      .exec();
-  }
-
-  async getUsuarioById(id: string) {
-    if (!Types.ObjectId.isValid(id)) return null;
-    return await Usuario.findById(id)
-      .populate('id_dificultad')
-      .populate('id_editorial')
-      .exec();
-  }
 }
