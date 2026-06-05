@@ -21,6 +21,7 @@
   },
   "homepage": "https://github.com/MobileLegendsUMSS/mercader-server#readme",
   "dependencies": {
+    "@getbrevo/brevo": "^5.0.4",
     "bcryptjs": "^3.0.3",
     "cloudinary": "^2.10.0",
     "cors": "^2.8.6",
@@ -30,7 +31,7 @@
     "mongoose": "^9.4.1",
     "multer": "^2.1.1",
     "node-cron": "^4.2.1",
-    "resend": "^6.12.4",
+    "sib-api-v3-sdk": "^8.5.0",
     "tsx": "^4.21.0"
   },
   "devDependencies": {
@@ -41,6 +42,7 @@
     "@types/jsonwebtoken": "^9.0.10",
     "@types/multer": "^2.1.0",
     "@types/node": "^25.9.1",
+    "ts-node": "^10.9.2",
     "typescript": "^6.0.3"
   }
 }
