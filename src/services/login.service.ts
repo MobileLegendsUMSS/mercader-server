@@ -12,7 +12,6 @@ if (!JWT_SECRET) {
 }
 
 export async function autenticarUsuario(datos: UserTypes.LoginPayload) {
-  // Validar que los datos no estén vacíos
   if (!datos.nombre || !datos.contrasenna) {
     throw new Error('El nombre y la contraseña son requeridos');
   }
@@ -34,7 +33,19 @@ export async function autenticarUsuario(datos: UserTypes.LoginPayload) {
   }
 
   const formatedUserId = usuario._id.toString();
-  console.log(formatedUserId);
+
+  // Obtener el rol del usuario
+  const usuarioRol = await UsuarioRol.findOne({ id_usuario: usuario._id });
+  if (!usuarioRol) {
+    throw new Error('No se encontró el rol del usuario');
+  }
+
+  const rolDoc = await Rol.findOne({ _id: usuarioRol.id_rol });
+  if (!rolDoc) {
+    throw new Error('No se encontró el rol del usuario');
+  }
+
+  const rolNombre = rolDoc.nombre_rol;
 
   const idRol = await UsuarioRol.findOne({ id_usuario: usuario._id });
   if (!idRol) {
@@ -68,23 +79,6 @@ export async function autenticarUsuario(datos: UserTypes.LoginPayload) {
       id: usuario._id.toString(),
       nombre: usuario.nombre,
     },
-    rol: rolName
+    rol: rolNombre
   };
-};
-
-export class UsuarioService {
-  async getUsuario() {
-    return await Usuario.find()
-      .populate('id_dificultad')
-      .populate('id_editorial')
-      .exec();
-  }
-
-  async getUsuarioById(id: string) {
-    if (!Types.ObjectId.isValid(id)) return null;
-    return await Usuario.findById(id)
-      .populate('id_dificultad')
-      .populate('id_editorial')
-      .exec();
-  }
 }

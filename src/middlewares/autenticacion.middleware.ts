@@ -30,11 +30,12 @@ export const autenticarToken = (
 
     // Verificar y decodificar el token
     const decodificado = jwt.verify(token, JWT_SECRET) as any;
-
-    // Guardar los datos del usuario en la request
+    
+    // Guardar los datos del usuario en la request (incluyendo el rol)
     req.user = {
       id_usuario: decodificado.id_usuario,
-      nombre: decodificado.nombre
+      nombre: decodificado.nombre,
+      rol: decodificado.rol
     } as TokenTypes.TokenPayload;
 
     next();
