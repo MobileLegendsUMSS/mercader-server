@@ -17,13 +17,14 @@ router.get(
   Autenticacion.autenticarToken,
   GameController.getGameById
 );
-router.get('/', Autorizacion.autenticarToken, juegoController.getAllGames);
 
-router.get('/:id', Autorizacion.autenticarToken, GameController.getGameById);
-
-router.get('/servicios', Autorizacion.autenticarToken, GameController.getGameServices);
-
-router.post('/', Autorizacion.autenticarToken, GameController.createGame);
+router.get(
+  "/servicios",
+  Autenticacion.autenticarToken,
+  Autorizacion.verifyAllowedRoles(["admin", "superadmin"]),
+  MulterCheck.checkGameImageErrors,
+  GameController.getGameServices
+);
 
 router.get(
   "/sistema/recientes",

@@ -19,8 +19,5 @@ export const env = {
   JWT_SECRET: verifyEnvVariable("JWT_SECRET", undefined),
   CLOUDINARY_CLOUD_NAME: verifyEnvVariable("CLOUDINARY_CLOUD_NAME", undefined),
   CLOUDINARY_API_KEY: verifyEnvVariable("CLOUDINARY_API_KEY", undefined),
-  CLOUDINARY_API_SECRET: verifyEnvVariable("CLOUDINARY_API_SECRET", undefined),
-  SEND_USER: verifyEnvVariable("SEND_USER", undefined),
-  SEND_EMAIL_USER: verifyEnvVariable("SEND_EMAIL_USER", "no-reply"),
-  RESEND_API_KEY: verifyEnvVariable("RESEND_API_KEY", undefined)
+  CLOUDINARY_API_SECRET: verifyEnvVariable("CLOUDINARY_API_SECRET", undefined)
 };
