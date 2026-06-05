@@ -7,20 +7,24 @@ export async function sendOverdueEmail(
   userName: string,
   gameTitle: string,
   limitDate: Date) {
-  const formatedLimitDate = toBoliviaTime(limitDate.toISOString());
+  try {
+    const formatedLimitDate = toBoliviaTime(limitDate.toISOString());
 
-  await resend.emails.send({
-    from: env.SEND_USER,
-    to: targetMail,
-    subject: "Préstamo vencido - Devolución requerida",
-    html: `
+    await resend.emails.send({
+      from: env.SEND_USER,
+      to: targetMail,
+      subject: "Préstamo vencido - Devolución requerida",
+      html: `
       <h2>Hola, ${userName}</h2>
       <p>Tu préstamo del juego <strong>${gameTitle}</strong> venció el 
       <strong>${formatedLimitDate}</strong> y aún no ha sido devuelto.</p>
       <p>Por favor acércate a devolver el juego a la brevedad posible.</p>
       <p><strong>Se aplicará una multa por cada día de retraso.</strong></p>
     `
-  });
+    });
+  } catch (err) {
+    throw new Error(`Error al enviar correo electronico: ${(err as Error).message}`);
+  }
 
   /*
   await transporter.sendMail({
