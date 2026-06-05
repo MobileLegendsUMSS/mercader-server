@@ -1,6 +1,6 @@
 import { Types } from 'mongoose';
 import { generateToken } from '../utils/jwt.helper';
-import { Usuario, IUsuario } from '../models/usuario.model';
+import { Usuario } from '../models/usuario.model';
 import * as UserTypes from '../types/usuario.types';
 import bcrypt from 'bcryptjs';
 import { UsuarioRol } from '../models/usuarioRol.model';
