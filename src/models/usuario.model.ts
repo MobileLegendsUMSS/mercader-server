@@ -29,12 +29,10 @@ const userSchema = new mongoose.Schema<UserTypes.IUsuario>(
     },
     nombres: {
       type: String,
-      unique: true,
       required: false
     },
     apellidos: {
       type: String,
-      unique: true,
       required: false
     },
     telefono: {
