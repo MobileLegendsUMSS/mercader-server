@@ -1,6 +1,5 @@
 import { env } from "../config/env.config"
 import { brevo } from "../config/brevo.config";
-import { toBoliviaTime } from "./date.helper"
 
 export async function sendOverdueEmail(
   targetMail: string,
