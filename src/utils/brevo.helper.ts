@@ -8,7 +8,7 @@ export async function sendOverdueEmail(
   gameTitle: string,
   limitDate: Date) {
   try {
-    const formatedLimitDate = toBoliviaTime(limitDate.toISOString());
+    const formatedLimitDate = new Date(limitDate.getTime() - (4 * 60 * 60 * 1000));
 
     const result = await brevo.transactionalEmails.sendTransacEmail({
       subject: `Recordatorio sobre tu juego: ${gameTitle}`,
