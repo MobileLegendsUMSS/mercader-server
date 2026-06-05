@@ -1,5 +1,8 @@
 import { env } from "../config/env.config";
 import nodemailer from "nodemailer";
+import dns from "dns";
+
+dns.setDefaultResultOrder("ipv4first");
 
 export const transporter = nodemailer.createTransport({
   host: env.SEND_EMAIL_HOST,
