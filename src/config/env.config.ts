@@ -22,5 +22,5 @@ export const env = {
   CLOUDINARY_API_SECRET: verifyEnvVariable("CLOUDINARY_API_SECRET", undefined),
   SEND_USER: verifyEnvVariable("SEND_USER", undefined),
   SEND_EMAIL_USER: verifyEnvVariable("SEND_EMAIL_USER", "no-reply"),
-  RESEND_API_KEY: verifyEnvVariable("RESEND_API_KEY", undefined)
+  BREVO_API_KEY: verifyEnvVariable("BREVO_API_KEY", undefined)
 };

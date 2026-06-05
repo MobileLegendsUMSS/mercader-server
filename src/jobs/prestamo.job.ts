@@ -3,7 +3,7 @@ import { Prestamo } from "../models/prestamo.model";
 import { PrestamoJuego } from "../models/prestamojuego.model";
 import { Usuario } from "../models/usuario.model";
 import { Juego } from "../models/juego.model";
-import { sendOverdueEmail } from "../utils/resend.helper";
+import { sendOverdueEmail } from "../utils/brevo.helper";
 import * as ServicioTypes from "../types/servicio.types";
 
 nodeCron.schedule("* * * * *", async function checkExpiredLoans() {
