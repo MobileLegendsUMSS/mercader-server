@@ -24,4 +24,5 @@ export const env = {
   SEND_USER: verifyEnvVariable("SEND_USER", undefined),
   SEND_EMAIL_USER: verifyEnvVariable("SEND_EMAIL_USER", "no-reply"),
   SEND_EMAIL_PASSWORD: verifyEnvVariable("SEND_EMAIL_PASSWORD", undefined),
+  RESEND_API_KEY: verifyEnvVariable("RESEND_API_KEY", undefined)
 };
