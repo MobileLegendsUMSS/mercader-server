@@ -20,9 +20,7 @@ export const env = {
   CLOUDINARY_CLOUD_NAME: verifyEnvVariable("CLOUDINARY_CLOUD_NAME", undefined),
   CLOUDINARY_API_KEY: verifyEnvVariable("CLOUDINARY_API_KEY", undefined),
   CLOUDINARY_API_SECRET: verifyEnvVariable("CLOUDINARY_API_SECRET", undefined),
-  SEND_EMAIL_HOST: verifyEnvVariable("SEND_EMAIL_HOST", undefined),
   SEND_USER: verifyEnvVariable("SEND_USER", undefined),
   SEND_EMAIL_USER: verifyEnvVariable("SEND_EMAIL_USER", "no-reply"),
-  SEND_EMAIL_PASSWORD: verifyEnvVariable("SEND_EMAIL_PASSWORD", undefined),
   RESEND_API_KEY: verifyEnvVariable("RESEND_API_KEY", undefined)
 };
