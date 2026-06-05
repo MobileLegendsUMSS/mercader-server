@@ -356,8 +356,9 @@ export async function updateGameById(
           messageState: "Categoria de juego no encontrada."
         };
       }
+      console.log(foundCategory);
       const updatedGame = await JuegoCategoria.findOneAndUpdate(
-        { _id: formatedIdGame },
+        { id_juego: formatedIdGame },
         { $set: { id_categoria: foundCategory._id } },
         { new: true }
       );
