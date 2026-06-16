@@ -28,4 +28,16 @@ router.post(
   categoriaController.create
 );
 
+router.patch(
+  "/:id",
+  Autenticacion.autenticarToken,
+  categoriaController.update
+);
+
+router.delete(
+  "/:id",
+  Autenticacion.autenticarToken,
+  categoriaController.delete
+);
+
 export default router;
