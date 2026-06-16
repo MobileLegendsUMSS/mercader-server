@@ -22,4 +22,16 @@ router.post(
   editorialController.create
 );
 
+router.patch(
+  "/:id",
+  Autenticacion.autenticarToken,
+  editorialController.update
+);
+
+router.delete(
+  "/:id",
+  Autenticacion.autenticarToken,
+  editorialController.delete
+);
+
 export default router;
