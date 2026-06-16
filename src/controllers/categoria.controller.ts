@@ -94,5 +94,47 @@ export const categoriaController = {
     } catch (error: any) {
       res.status(500).json({ success: false, error: error.message });
     }
+  },
+
+  async update(req: Request, res: Response) {
+    try {
+      const id = getValidObjectId(req.params.id);
+
+      if (!id) {
+        return res.status(400).json({
+          success: false,
+          error: 'ID invalido'
+        });
+      }
+
+      const result = await categoriaService.updateCategory(id, req.body);
+      if (!result.success) {
+        return res.status(400).json({ success: false, error: result.message });
+      }
+      res.json({ success: true, message: result.message, data: result.data });
+    } catch (error: any) {
+      res.status(500).json({ success: false, error: error.message });
+    }
+  },
+
+  async delete(req: Request, res: Response) {
+    try {
+      const id = getValidObjectId(req.params.id);
+
+      if (!id) {
+        return res.status(400).json({
+          success: false,
+          error: 'ID invalido'
+        });
+      }
+
+      const result = await categoriaService.deleteCategories(id);
+      if (!result.success) {
+        return res.status(400).json({ success: false, error: result.message });
+      }
+      res.json({ success: true, message: result.message });
+    } catch (error: any) {
+      res.status(500).json({ success: false, error: error.message });
+    }
   }
 };

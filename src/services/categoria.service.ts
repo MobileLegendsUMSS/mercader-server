@@ -15,6 +15,19 @@ export class CategoriaService {
     return await Categoria.findById(id).exec();
   }
 
+  async updateCategory(id: string, data: Partial<CategoriaTypes.ICategoria>): Promise<{ success: boolean; message: string; data?: CategoriaTypes.ICategoria }> {
+    if (!Types.ObjectId.isValid(id)) {
+      return { success: false, message: 'ID inválido' };
+    }
+
+    const categoria = await Categoria.findByIdAndUpdate(id, data, { new: true, runValidators: true }).exec();
+    if (!categoria) {
+      return { success: false, message: 'Categoria no encontrada' };
+    }
+
+    return { success: true, message: 'Categoria actualizada exitosamente', data: categoria };
+  }
+
   async deleteCategories(id: string): Promise<{ success: boolean; message: string }> {
     if (!Types.ObjectId.isValid(id)) {
       return { success: false, message: 'ID inválido' };
